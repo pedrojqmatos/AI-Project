@@ -1,39 +1,7 @@
 <!-- app.component.html -->
 <div class="flex h-screen bg-darkbg text-white">
   <!-- Sidebar -->
-  <aside class="w-72 bg-darkerbg p-4 flex flex-col">
-    <div class="flex space-x-4 mb-4 h-12" >
-      <a href="" class="w-[3rem] h-[3rem]">
-        <img src="../assets/images/logo.svg" class="w-full h-full" />
-      </a>
-      
-      
-      <input
-        type="text"
-        placeholder="Search Chats"
-        class="w-full   pl-4 rounded-lg bg-darkerbg text-white placeholder-gray-400 border-2 border-lightbg focus:outline-none focus:ring-0"
-      />
-    </div>
-    
-    <button class="mb-4 h-12 bg-darkerbg hover:bg-gray-700 text-white px-4 py-2 rounded-md border-2 border-lightbg transition-colors duration-250 ease-in-out">
-      + New Chat
-    </button>
-    
-    <div class="flex-1 overflow-y-auto">
-      <h2 class="text-sm text-gray-400 uppercase mb-2">Recents</h2>
-      <ul class="space-y-2">
-        <li class="hover:bg-gray-700 px-3 py-2 rounded-md cursor-pointer transition-colors duration-250 ease-in-out">🔈 Speak Any Language</li>
-        <li class="hover:bg-gray-700 px-3 py-2 rounded-md cursor-pointer transition-colors duration-250 ease-in-out">🧠 Explore Philosophy</li>
-        <!-- outros exemplos -->
-      </ul>
-
-      <h2 class="mt-6 text-sm text-gray-400 uppercase mb-2">Favorites</h2>
-      <ul class="space-y-2">
-        <li class="hover:bg-gray-700 px-3 py-2 rounded-md cursor-pointer transition-colors duration-250 ease-in-out">💡 Imagination Unleashed</li>
-        <li class="hover:bg-gray-700 px-3 py-2 rounded-md cursor-pointer transition-colors duration-250 ease-in-out">📚 Learn Something New</li>
-      </ul>
-    </div>
-  </aside>
+  <app-sidebar/>
 
   <!-- Main Chat Area -->
   <main class="flex-1 flex flex-col items-center justify-center p-8">
