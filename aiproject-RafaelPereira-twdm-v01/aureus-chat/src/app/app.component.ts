@@ -5,10 +5,8 @@ import { SidebarComponent } from "./sidebar/sidebar.component";
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [RouterOutlet, SidebarComponent],
+  imports: [RouterOutlet],
   templateUrl: './app.component.html',
-  styleUrls: ['./app.component.css'] 
-
 })
 export class AppComponent {
   title = 'aureus-chat';
