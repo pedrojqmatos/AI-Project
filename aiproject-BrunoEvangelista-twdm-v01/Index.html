@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>NebulAI</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    body {
+      font-family: 'Poppins', sans-serif;
+      background-image: url('nebula 1.png');
+      background-size: cover;
+      background-position: center;
+    }
+    body::before {
+      content: '';
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: black;
+      opacity: 0.65;
+      z-index: -1;
+    }
+  </style>
+</head>
+<body class="text-white h-screen w-screen flex overflow-hidden">
+
+  <!-- Sidebar -->
+  <aside class="w-1/4 bg-black bg-opacity-30 p-4 flex flex-col justify-between">
+    <div>
+      <button class="mb-4 bg-white text-black px-4 py-2 rounded hover:bg-gray-300 w-full">Adicionar Conversa</button>
+      <div id="conversations" class="space-y-2">
+        <button class="w-full text-left px-3 py-2 bg-white bg-opacity-10 hover:bg-opacity-20 rounded">Conversa 1</button>
+        <button class="w-full text-left px-3 py-2 bg-white bg-opacity-10 hover:bg-opacity-20 rounded">Piscinas para o Verão</button>
+      </div>
+    </div>
+    <div class="flex justify-around mt-4">
+      <button class="text-lg">⚙️</button>
+      <button class="text-lg">📄</button>
+      <button class="text-lg">❓</button>
+    </div>
+  </aside>
+
+  <!-- Main content -->
+  <main class="flex-1 flex flex-col justify-between p-8 relative">
+    <div class="flex justify-between items-center mb-6">
+      <h1 class="text-2xl font-semibold">NEBULAI</h1>
+      <div class="relative">
+        <img src="https://i.pravatar.cc/40" alt="Perfil" class="w-10 h-10 rounded-full cursor-pointer" onclick="toggleProfile()" />
+        <div id="profileDropdown" class="hidden absolute right-0 mt-2 w-48 bg-white text-black rounded shadow-md">
+          <p class="px-4 py-2 border-b">Bruno Evangelista</p>
+          <button class="px-4 py-2 hover:bg-gray-100 w-full text-left">Modo escuro</button>
+          <button class="px-4 py-2 hover:bg-gray-100 w-full text-left">Definições</button>
+          <button class="px-4 py-2 hover:bg-gray-100 w-full text-left">Terminar sessão</button>
+        </div>
+      </div>
+    </div>
+
+    <div id="chat-container" class="p-4 overflow-y-auto h-[70vh] space-y-4"></div>
+
+    <form id="chat-form" class="flex items-center mt-4">
+      <input id="message-input" type="text" class="flex-1 border p-2 rounded text-black" placeholder="Escreve a tua mensagem..." required />
+      <button type="submit" class="ml-2 px-4 py-2 bg-blue-500 text-white rounded">Enviar</button>
+    </form>
+  </main>
+
+  <script src="Script.js"></script>
+</body>
+</html>
