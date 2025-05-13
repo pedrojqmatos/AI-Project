@@ -7,31 +7,44 @@
   <link rel="stylesheet" href="signup.css">
 </head>
 <body>
+
   <div class="container">
     <div class="left">
       <p>Ideias, respostas, criatividade…<br>O que precisar, estou aqui!<br>Vamos começar?</p>
     </div>
+
     <div class="logo">
-        <img src="imagens/icon QIA.png" alt="Logo QIA">
-        <span>QIA</span>
-      </div>
+      <img src="imagens/icon QIA.png" alt="Logo QIA">
+      <span>QIA</span>
+    </div>
+
     <div class="right">
       <div class="form-box">
-        <h2>Create Account</h2>
+        <h2>Criar Conta</h2>
+
+        <!-- Botões de autenticação social -->
         <button class="social-button">
           <img src="imagens/apple-icon.png" alt="Apple"/> Conta Apple
         </button>
         <button class="social-button">
           <img src="imagens/google-icon.png" alt="Google"/> Conta Google
         </button>
-        <div class="divider">or</div>
-        <input type="text" placeholder="Primeiro e ultimo nome">
-        <input type="text" placeholder="Nome de utilizador">
-        <input type="email" placeholder="Email">
-        <input type="password" placeholder="Password">
-        <button class="submit-button">Seguinte</button>
+
+        <div class="divider">ou</div>
+
+        <!-- Formulário de cadastro -->
+        <input type="text" id="nome" placeholder="Primeiro e último nome">
+        <input type="text" id="username" placeholder="Nome de utilizador">
+        <input type="email" id="email" placeholder="Email" required>
+        <input type="password" id="password" placeholder="Password" required>
+        
+        <button class="submit-button" id="create-account-btn">Criar Conta</button>
       </div>
     </div>
   </div>
+
+  <!-- Firebase SDK's -->
+  <script src="signup.js" type="module"></script>
+
 </body>
 </html>
