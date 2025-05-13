@@ -1,121 +1,155 @@
 * {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-  }
-  
-  body {
-    font-family: 'Segoe UI', sans-serif;
-    background-color: #d1d5db;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    height: 100vh;
-  }
-  
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Segoe UI', sans-serif;
+  background-color: #d1d5db;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+}
+
+.container {
+  display: flex;
+  width: 100%;
+  height: 100%;
+  background-color: white;
+  overflow: hidden;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+}
+
+.left-panel {
+  width: 50%;
+  background-color: #d1d5db;
+  padding: 40px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  position: relative;
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  margin-bottom: 30px;
+  position: absolute;
+  top: 5px;
+}
+
+.logo img {
+  width: 24px;
+  height: 24px;
+  margin-right: 8px;
+}
+
+.logo span {
+  font-size: 14px;
+  color: #059669;
+  font-weight: bold;
+}
+
+.text p {
+  font-size: 36px;
+  color: #1f2937;
+  line-height: 1.2;
+}
+
+.right-panel {
+  width: 50%;
+  background-color: #1f2937;
+  color: white;
+  padding: 40px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.right-panel h2 {
+  font-size: 34px;
+  font-weight: 300;
+  margin-bottom: 20px;
+}
+
+.right-panel .blue {
+  color: #3b82f6;
+  font-weight: 500;
+}
+
+.icon {
+  border-radius: 50%;
+  padding: 16px;
+  margin-bottom: 30px;
+}
+
+.icon img {
+  width: 60px;
+  height: 60px;
+}
+
+.btn {
+  width: 100%;
+  max-width: 300px;
+  padding: 12px;
+  border: none;
+  border-radius: 6px;
+  font-weight: bold;
+  color: white;
+  margin-bottom: 12px;
+  cursor: pointer;
+}
+
+.login {
+  background-color: #22c55e;
+}
+
+.login:hover {
+  background-color: #16a34a;
+}
+
+.signup {
+  background-color: #2563eb;
+}
+
+.signup:hover {
+  background-color: #1d4ed8;
+}
+
+/* MEDIA QUERY RESPONSIVA */
+@media (max-width: 768px) {
   .container {
-    display: flex;
-    width: 100%;
-    height: 100%;
-    background-color: white;
-    overflow: hidden;
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
-  }
-  
-  /* Esquerda */
-  .left-panel {
-    width: 50%;
-    background-color: #d1d5db;
-    padding: 40px;
-    display: flex;
     flex-direction: column;
-    justify-content: center;
   }
-  
-  .logo {
-    display: flex;
-    align-items: center;
-    margin-bottom: 30px;
-    position:absolute ;
-    top: 5px;
-  }
-  
-  .logo img {
-    width: 24px;
-    height: 24px;
-    margin-right: 8px;
-  }
-  
-  .logo span {
-    font-size: 14px;
-    color: #059669;
-    font-weight: bold;
-  }
-  
-  .text p {
-    font-size: 36px;
-    color: #1f2937;
-    line-height: 1.2;
-  }
-  
-  /* Direita */
+
+  .left-panel,
   .right-panel {
-    width: 50%;
-    background-color: #1f2937;
-    color: white;
-    padding: 40px;
-    display: flex;
-    flex-direction: column;
+    width: 100%;
+    height: auto;
+    padding: 20px;
     align-items: center;
+    text-align: center;
+  }
+
+  .text p {
+    font-size: 28px;
+  }
+
+  .logo {
+    position: static;
+    margin-bottom: 20px;
     justify-content: center;
   }
-  
+
   .right-panel h2 {
-    font-size: 34px;
-    font-weight: 300;
-    margin-bottom: 20px;
+    font-size: 28px;
   }
-  
-  .right-panel .blue {
-    color: #3b82f6;
-    font-weight: 500;
-  }
-  
-  .icon {
-    border-radius: 50%;
-    padding: 16px;
-    margin-bottom: 30px;
-  }
-  
+
   .icon img {
-    width: 60px;
-    height: 60px;
+    width: 50px;
+    height: 50px;
   }
-  
-  .btn {
-    width: 100%;
-    max-width: 300px;
-    padding: 12px;
-    border: none;
-    border-radius: 6px;
-    font-weight: bold;
-    color: white;
-    margin-bottom: 12px;
-    cursor: pointer;
-  }
-  
-  .login {
-    background-color: #22c55e;
-  }
-  
-  .login:hover {
-    background-color: #16a34a;
-  }
-  
-  .signup {
-    background-color: #2563eb;
-  }
-  
-  .signup:hover {
-    background-color: #1d4ed8;
-  }
+}
