@@ -1,0 +1,21 @@
+/* Aparece gradualmente de cima para baixo */
+.reveal-text {
+    display: inline-block;  /* Para que o texto ocupe várias linhas */
+    overflow: hidden; /* Garante que o conteúdo não será visível até a animação */
+    max-height: 0; /* Inicialmente, a altura é 0 */
+    opacity: 0; /* Inicialmente, o texto está invisível */
+    animation: reveal 2s ease-in-out forwards;
+  }
+  
+  /* Animação de revelação */
+  @keyframes reveal {
+    0% {
+      max-height: 0;
+      opacity: 0;
+    }
+    100% {
+      max-height: 1000px; /* Define uma altura suficiente para o texto */
+      opacity: 1;
+    }
+  }
+  
