@@ -1,56 +1,115 @@
 * {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-  }
-  
-  body, html {
-    height: 100%;
-    font-family: Arial, sans-serif;
-  }
-  
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body, html {
+  height: 100%;
+  font-family: Arial, sans-serif;
+}
+
+.container {
+  display: flex;
+  flex-wrap: wrap;
+  width: 100%;
+  height: 100vh;
+  background-color: #ccc;
+}
+
+.left, .right {
+  flex: 1 1 50%;
+  min-height: 50vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 40px;
+}
+
+.left {
+  background-color: #ccc;
+  color: #2c2c2c;
+  font-size: 1.5rem;
+  line-height: 1.6;
+}
+
+.right {
+  background-color: #2d2d39;
+  justify-content: center;
+  align-items: center;
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  margin-bottom: 30px;
+  position: absolute;
+  top: 5px;
+  left: 40px;
+}
+
+.logo img {
+  width: 24px;
+  height: 24px;
+  margin-right: 8px;
+}
+
+.logo span {
+  font-size: 14px;
+  color: #059669;
+  font-weight: bold;
+}
+
+.message-box {
+  text-align: center;
+  color: white;
+  font-size: 1.3rem;
+  line-height: 1.6;
+}
+
+.icon {
+  font-size: 2rem;
+  margin-top: 20px;
+}
+
+/* Responsividade */
+@media (max-width: 768px) {
   .container {
-    display: flex;
-    width: 100%;
-    height: 100vh;
-    background-color: #ccc; /* cor cinza clara do fundo */
-  }
-  
-  .left {
-    flex: 1;
-    display: flex;
     flex-direction: column;
-    justify-content: center;
-    padding: 40px;
-    color: #2c2c2c;
-    background-color: #ccc;
-    font-size: 1.5rem;
-    line-height: 1.6;
   }
-  
-  .logo {
-    font-weight: bold;
-    color: #00cc99;
-    margin-bottom: 20px;
-  }
-  
-  .right {
-    flex: 1;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    background-color: #2d2d39;
-  }
-  
-  .message-box {
+
+  .left, .right {
+    flex: 1 1 100%;
+    padding: 20px;
     text-align: center;
-    color: white;
-    font-size: 1.3rem;
-    line-height: 1.6;
   }
-  
+
+  .logo {
+    position: static;
+    justify-content: center;
+    margin-top: 10px;
+  }
+}
+
+@media (max-width: 480px) {
+  .left {
+    font-size: 1.2rem;
+  }
+
+  .message-box {
+    font-size: 1rem;
+  }
+
   .icon {
-    font-size: 2rem;
-    margin-top: 20px;
+    font-size: 1.5rem;
   }
-  
+
+  .logo img {
+    width: 20px;
+    height: 20px;
+  }
+
+  .logo span {
+    font-size: 12px;
+  }
+}
