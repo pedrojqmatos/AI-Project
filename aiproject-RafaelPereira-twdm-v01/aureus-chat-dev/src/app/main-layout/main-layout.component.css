@@ -1,21 +1,23 @@
-/* Aparece gradualmente de cima para baixo */
 .reveal-text {
-    display: inline-block;  /* Para que o texto ocupe várias linhas */
-    overflow: hidden; /* Garante que o conteúdo não será visível até a animação */
-    max-height: 0; /* Inicialmente, a altura é 0 */
-    opacity: 0; /* Inicialmente, o texto está invisível */
-    animation: reveal 2s ease-in-out forwards;
+  animation: fadeInUp 0.4s ease-in-out;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
   }
-  
-  /* Animação de revelação */
-  @keyframes reveal {
-    0% {
-      max-height: 0;
-      opacity: 0;
-    }
-    100% {
-      max-height: 1000px; /* Define uma altura suficiente para o texto */
-      opacity: 1;
-    }
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
-  
+}
+
+.scroll-hidden {
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE 10+ */
+}
+
+.scroll-hidden::-webkit-scrollbar {
+  display: none; /* Chrome, Safari */
+}

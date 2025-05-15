@@ -1,11 +1,12 @@
-import { Component, inject, computed } from '@angular/core';
+import { Component, inject, computed, AfterViewInit } from '@angular/core';
 import { NgIf, NgFor, CommonModule } from '@angular/common';
 import { RouterOutlet } from '@angular/router';
 import { SidebarComponent } from '../sidebar/sidebar.component';
 import { AuthService } from '../auth.service';
 import { Router } from '@angular/router';
-import { AiService } from '../services/huggingface.service' // ajusta o caminho se necessário
+import { AiService } from '../services/lmstudio.service' // ajusta o caminho se necessário
 import { FormsModule } from '@angular/forms';
+import { ViewChild, ElementRef } from '@angular/core';
 
 @Component({
   selector: 'app-main-layout',
@@ -14,17 +15,21 @@ import { FormsModule } from '@angular/forms';
   templateUrl: './main-layout.component.html',
   styleUrl: './main-layout.component.css'
 })
-export class MainLayoutComponent {
+export class MainLayoutComponent implements AfterViewInit {
   authService = inject(AuthService);
   router = inject(Router);
   aiService = inject(AiService);
 
+  @ViewChild('chatContainer') chatContainer!: ElementRef;
+
   showMenu = false;
   userInput = '';
-  animateResponse = false;
-  aiResponse = '';
   isChatActive = false;
   isLoading = false;
+
+  messages: { sender: 'user' | 'ai', text: string, animate: boolean }[] = [];
+
+  username = computed(() => this.authService.currentUserSig()?.username ?? null);
 
   toggleMenu() {
     this.showMenu = !this.showMenu;
@@ -36,27 +41,41 @@ export class MainLayoutComponent {
     });
   }
 
-  username = computed(() => this.authService.currentUserSig()?.username ?? null);
+  ngAfterViewInit(): void {
+    this.scrollToBottom(); // garante scroll no início, se houver mensagens
+  }
+
+  scrollToBottom() {
+    setTimeout(() => {
+      if (this.chatContainer?.nativeElement) {
+        this.chatContainer.nativeElement.scrollTop =
+          this.chatContainer.nativeElement.scrollHeight;
+      }
+    }, 300); // tempo da animação reveal-text
+  }
 
   async sendPrompt() {
-    if (!this.userInput.trim()) return;
+    const prompt = this.userInput.trim();
+    if (!prompt) return;
+
     this.isLoading = true;
     this.isChatActive = true;
-    this.aiResponse = '';
-    this.animateResponse = false;
+
+    this.messages.push({ sender: 'user', text: prompt, animate: false });
+    this.scrollToBottom();
 
     try {
-      const response = await this.aiService.ask(this.userInput);
-      this.aiResponse = response;
+      const history = this.messages.map(m => `${m.sender === 'user' ? 'User' : 'AI'}: ${m.text}`).join('\n');
+      const response = await this.aiService.ask(history + `\nUser: ${prompt}\nAI:`);
 
-      // força reflow e ativa a animação
-      setTimeout(() => {
-        this.animateResponse = true;
-      }, 20);
+      this.messages.push({ sender: 'ai', text: response, animate: true });
+      this.scrollToBottom();
 
     } catch {
-      this.aiResponse = 'An error occurred while fetching the AI response.';
+      this.messages.push({ sender: 'ai', text: 'An error occurred while fetching the AI response.', animate: false });
+      this.scrollToBottom();
     } finally {
+      this.userInput = '';
       this.isLoading = false;
     }
   }
