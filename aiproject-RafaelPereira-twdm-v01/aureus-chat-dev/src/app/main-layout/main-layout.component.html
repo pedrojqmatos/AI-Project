@@ -18,16 +18,16 @@
     </div>
 
     <!-- Logo e título -->
-    <div class="flex flex-col items-center transition-opacity duration-700 ease-in-out"
-         [ngClass]="{'opacity-0 pointer-events-none': isChatActive, 'opacity-100': !isChatActive}">
+    <div *ngIf="!isChatActive"
+     class="flex flex-col items-center transition-opacity duration-700 ease-in-out">
       <img src="../assets/images/logo.svg" class="w-30 h-30 pb-2" />
       <div class="text-6xl font-medium mb-8">Aureus <span class="text-blue-400">Chat</span></div>
     </div>
 
     <!-- Área de mensagens com scroll -->
-    <div #chatContainer
-      class="w-full max-w-2xl flex-1 flex flex-col gap-4 overflow-y-auto px-2 scroll-hidden"
-      style="min-height: 0; max-height: calc(100vh - 260px);">
+    <div *ngIf="isChatActive"
+     #chatContainer
+     class="w-[70%] max-w-[1600px] flex-1 flex flex-col h-[90%] gap-4 overflow-y-auto px-2 scroll-hidden" >
       <div *ngFor="let msg of messages"
            class="p-4 rounded-lg whitespace-pre-wrap"
            [ngClass]="[
@@ -37,9 +37,12 @@
         {{ msg.text }}
       </div>
     </div>
+    
+    <!-- Loading -->
+    <div *ngIf="isLoading" class="text-blue-400 mb-4">Thinking...</div>
 
     <!-- Campo de input -->
-    <div class="w-full max-w-2xl relative mb-6 transition-all duration-700 ease-in-out"
+    <div class="w-[70%] max-w-[1600px] relative mb-6 transition-all duration-700 ease-in-out"
          [ngClass]="{'mt-auto': isChatActive}">
       <input [(ngModel)]="userInput"
              (keyup.enter)="sendPrompt()"
@@ -52,7 +55,6 @@
            (click)="sendPrompt()" />
     </div>
 
-    <!-- Loading -->
-    <div *ngIf="isLoading" class="text-blue-400 mb-4">Thinking...</div>
+    
   </main>
 </div>

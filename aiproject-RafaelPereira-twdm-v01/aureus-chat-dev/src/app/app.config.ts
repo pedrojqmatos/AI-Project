@@ -6,6 +6,7 @@ import { provideHttpClient } from '@angular/common/http';
 import { initializeApp } from 'firebase/app';
 import {getAuth, provideAuth} from '@angular/fire/auth'
 
+
 const firebaseConfig = {
   apiKey: "AIzaSyCaroJ5prNxfnT7XQLOaMqNxVMiEc2qTXw",
   authDomain: "aureus-chat.firebaseapp.com",
