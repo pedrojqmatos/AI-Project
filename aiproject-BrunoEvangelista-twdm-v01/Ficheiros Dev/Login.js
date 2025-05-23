@@ -1,4 +1,3 @@
-// Configuração Firebase
 const firebaseConfig = {
   apiKey: "AIzaSyBisWry9zJcHgIJqMRbHThgqbE96yey5VU",
   authDomain: "nebulai-7aa4b.firebaseapp.com",
@@ -9,17 +8,10 @@ const firebaseConfig = {
   measurementId: "G-THXE4Y0HGF"
 };
 
-// Inicializar Firebase
 firebase.initializeApp(firebaseConfig);
 
-// Esperar que o DOM carregue
 window.addEventListener("DOMContentLoaded", () => {
   const submitBtn = document.getElementById("submit");
-
-  if (!submitBtn) {
-    alert("❌ Botão não encontrado no DOM!");
-    return;
-  }
 
   submitBtn.addEventListener("click", function (event) {
     event.preventDefault();
@@ -31,8 +23,9 @@ window.addEventListener("DOMContentLoaded", () => {
       .then((userCredential) => {
         const user = userCredential.user;
         alert("✅ Login bem-sucedido!\nEmail: " + user.email);
-        // Redirecionar se quiseres:
-        // window.location.href = "dashboard.html";
+
+        // Redirecionar para index.html
+        window.location.href = "index.html";
       })
       .catch((error) => {
         alert("❌ Erro no login:\n" + error.message);
