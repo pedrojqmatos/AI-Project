@@ -20,6 +20,7 @@ export class AppComponent {
     this.authService.user$.subscribe(user =>{
       if(user){
         this.authService.currentUserSig.set({
+          uid: user.uid,
           email: user.email! ,
           username: user.displayName!
         })

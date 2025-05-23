@@ -1,63 +1,32 @@
-
 <!DOCTYPE html>
 <html lang="pt">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>NebulAI — Login</title>
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
   <script src="https://cdn.tailwindcss.com"></script>
-
-  <style>
-    body {
-      font-family: 'Poppins', sans-serif;
-    }
-
-    body::after {
-      content: '';
-      background-image: url('./nebula 1.png');
-      background-size: cover;
-      background-position: center;
-      background-repeat: no-repeat;
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      opacity: 0.35;
-      z-index: -1;
-    }
-  </style>
+  <link rel="stylesheet" href="Styles.css" />
 </head>
-<body class="flex items-center justify-center h-screen text-white">
+<body class="login flex items-center justify-center h-screen text-white">
 
-  <div class="bg-black bg-opacity-60 p-12 rounded-2xl shadow-2xl w-[420px]">
+  <div class="bg-white bg-opacity-10 backdrop-blur-lg p-10 rounded-2xl shadow-2xl w-[400px]">
     <h1 class="text-3xl font-semibold mb-6 text-center">Bem-vindo à <span class="text-cyan-400">NebulAI</span></h1>
     
-    <form class="space-y-5">
-      <div>
-        <label class="block mb-1 text-sm">Email</label>
-        <input type="email" placeholder="teu@email.com" class="w-full px-4 py-2 rounded-lg bg-gray-800 text-white focus:outline-none focus:ring-2 focus:ring-cyan-400"/>
-      </div>
-
-      <div>
-        <label class="block mb-1 text-sm">Palavra-passe</label>
-        <input type="password" placeholder="••••••••" class="w-full px-4 py-2 rounded-lg bg-gray-800 text-white focus:outline-none focus:ring-2 focus:ring-cyan-400"/>
-      </div>
-
-      <button id= "loginBtn" type="button" class="w-full bg-cyan-500 hover:bg-cyan-600 transition-all py-2 rounded-lg font-semibold">
+    <form id="login-form" class="space-y-5">
+      <input type="email" id="email" placeholder="Email" required class="w-full px-4 py-3 rounded-xl bg-gray-800 text-white focus:outline-none focus:ring-2 focus:ring-cyan-400" />
+      <input type="password" id="password" placeholder="Palavra-passe" required class="w-full px-4 py-3 rounded-xl bg-gray-800 text-white focus:outline-none focus:ring-2 focus:ring-cyan-400" />
+      
+      <button type="submit" class="w-full bg-cyan-500 hover:bg-cyan-600 transition-all py-3 rounded-xl font-semibold text-white">
         Iniciar sessão
       </button>
-
-      <script src="Styles.js"></script>
-      
     </form>
 
-    <p class="mt-6 text-center text-sm text-gray-300">
-      Ainda não tens conta?
-      <a href="#" class="text-cyan-400 hover:underline">Criar conta</a>
-    </p>
+    <div class="mt-6 text-sm text-center text-gray-300">
+      <a href="RePP.html" class="text-cyan-400 hover:underline">Esqueceste-te da palavra-passe?</a><br />
+      <a href="#" class="text-cyan-400 hover:underline">Criar nova conta</a>
+    </div>
   </div>
 
+  <script src="Login.js"></script>
 </body>
 </html>

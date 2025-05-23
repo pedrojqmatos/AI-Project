@@ -3,68 +3,112 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>NebulAI</title>
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet" />
+  <title>NebulAI — Chat</title>
   <script src="https://cdn.tailwindcss.com"></script>
-  <style>
-    body {
-      font-family: 'Poppins', sans-serif;
-      background-image: url('nebula 1.png');
-      background-size: cover;
-      background-position: center;
-    }
-    body::before {
-      content: '';
-      position: fixed;
-      top: 0; left: 0;
-      width: 100%; height: 100%;
-      background: black;
-      opacity: 0.65;
-      z-index: -1;
-    }
-  </style>
+  <link rel="stylesheet" href="Styles.css" />
 </head>
-<body class="text-white h-screen w-screen flex overflow-hidden">
+<body class="text-white h-screen w-screen flex overflow-hidden bg-cover bg-center" style="background-image: url('imagens/nebula.png');">
 
   <!-- Sidebar -->
-  <aside class="w-1/4 bg-black bg-opacity-30 p-4 flex flex-col justify-between">
-    <div>
-      <button class="mb-4 bg-white text-black px-4 py-2 rounded hover:bg-gray-300 w-full">Adicionar Conversa</button>
-      <div id="conversations" class="space-y-2">
-        <button class="w-full text-left px-3 py-2 bg-white bg-opacity-10 hover:bg-opacity-20 rounded">Conversa 1</button>
-        <button class="w-full text-left px-3 py-2 bg-white bg-opacity-10 hover:bg-opacity-20 rounded">Piscinas para o Verão</button>
-      </div>
+  <aside class="w-1/4 bg-black bg-opacity-30 backdrop-blur-md p-4 flex flex-col">
+    <!-- Botão Nova Conversa -->
+    <button id="nova-conversa" class="mb-4 bg-white text-black px-4 py-2 rounded-xl font-semibold hover:bg-gray-300 w-full transition-all">
+      ➕ Nova Conversa
+    </button>
+  
+    <!-- Lista de conversas com scroll dinâmico -->
+    <div id="conversations" class="flex-1 overflow-y-auto space-y-2 pr-1">
+      <!-- Aqui vão os itens de conversa gerados dinamicamente -->
     </div>
-    <div class="flex justify-around mt-4">
-      <button class="text-lg">⚙️</button>
-      <button class="text-lg">📄</button>
-      <button class="text-lg">❓</button>
+  
+    <!-- Rodapé com ícones -->
+    <div class="flex justify-around mt-6 pt-4 border-t border-white/10 space-x-4">
+      <a href="https://instagram.com/nebulai" target="_blank" title="Instagram">
+        <img src="imagens/instagram.png" alt="Instagram" class="w-6 h-6 hover:scale-110 transition-transform" />
+      </a>
+      <a href="https://x.com/nebulai" target="_blank" title="X">
+        <img src="imagens/IconXb.png" alt="X" class="w-6 h-6 hover:scale-110 transition-transform" />
+      </a>
+      <a href="https://reddit.com/r/nebulai" target="_blank" title="Reddit">
+        <img src="imagens/reddit.png" alt="Reddit" class="w-6 h-6 hover:scale-110 transition-transform" />
+      </a>
     </div>
   </aside>
+  
 
-  <!-- Main content -->
+  <!-- Main -->
   <main class="flex-1 flex flex-col justify-between p-8 relative">
-    <div class="flex justify-between items-center mb-6">
-      <h1 class="text-2xl font-semibold">NEBULAI</h1>
-      <div class="relative">
-        <img src="https://i.pravatar.cc/40" alt="Perfil" class="w-10 h-10 rounded-full cursor-pointer" onclick="toggleProfile()" />
-        <div id="profileDropdown" class="hidden absolute right-0 mt-2 w-48 bg-white text-black rounded shadow-md">
-          <p class="px-4 py-2 border-b">Bruno Evangelista</p>
-          <button class="px-4 py-2 hover:bg-gray-100 w-full text-left">Modo escuro</button>
-          <button class="px-4 py-2 hover:bg-gray-100 w-full text-left">Definições</button>
-          <button class="px-4 py-2 hover:bg-gray-100 w-full text-left">Terminar sessão</button>
-        </div>
-      </div>
+    <img src="imagens/perfil.jpg"
+    alt="Perfil"
+    onclick="toggleProfile()"
+    class="w-10 h-10 rounded-full ring-2 ring-white cursor-pointer absolute top-8 right-8 z-10" />
+    <!-- Mensagem de boas-vindas -->
+    <div id="boas-vindas" class="absolute top-1/3 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-black/30 px-6 py-1 rounded-xl text-center text-xl text-white pointer-events-none">
+      <p>Olá, sou a <strong>NebulAI</strong>. Em que posso ajudar?</p>
     </div>
+      
 
-    <div id="chat-container" class="p-4 overflow-y-auto h-[70vh] space-y-4"></div>
+    <!-- Dropdown do perfil -->
+    <div id="profileDropdown" class="hidden absolute right-11 mt-8 w-64 bg-white text-black rounded-xl shadow-lg overflow-hidden z-20">
+      <!-- Nome do utilizador -->
+      <p class="px-4 py-2 border-b font-medium">Bruno Evangelista</p>
+    
+      <!-- Modo escuro -->
+      <button class="flex items-center justify-between px-4 py-2 hover:bg-gray-100 w-full text-left">
+        <div class="flex items-center">
+          <img src="imagens/lua.png" alt="Modo escuro" class="w-5 h-5 mr-2" />
+          Modo escuro
+        </div>
+        <!-- Switch fictício -->
+        <div class="w-10 h-5 bg-gray-300 rounded-full flex items-center p-0.5">
+          <div class="w-4 h-4 bg-black rounded-full"></div>
+        </div>
+      </button>
+    
+      <!-- Gerir contas -->
+      <a href="login.html" class="block px-4 py-3 bg-gray-100 hover:bg-gray-200">
+        <p class="text-sm font-semibold text-gray-700 mb-2">Gerir contas</p>
+    
+        <!-- Conta existente -->
+        <div class="flex items-center bg-white px-3 py-2 rounded-xl shadow-sm">
+          <img src="imagens/perfil.jpg" alt="Bruno Evangelista" class="w-8 h-8 rounded-full mr-3" />
+          <div>
+            <p class="text-sm font-medium">Bruno Evangelista</p>
+            <p class="text-xs text-gray-500">bruno@gmail.com</p>
+          </div>
+        </div>
+    
+        <!-- Link para adicionar nova conta -->
+        <p class="mt-3 text-sm text-center text-blue-600 hover:underline">Adicionar conta</p>
+      </a>
+    
+      <!-- Terminar sessão -->
+      <button id="logout-btn" class="flex items-center px-4 py-3 hover:bg-gray-100 w-full text-left text-red-600">
+        <img src="imagens/logOut.png" alt="Terminar sessão" class="w-5 h-5 mr-2" />
+        Terminar sessão
+      </button>
+    </div>
+    
+    
 
-    <form id="chat-form" class="flex items-center mt-4">
-      <input id="message-input" type="text" class="flex-1 border p-2 rounded text-black" placeholder="Escreve a tua mensagem..." required />
-      <button type="submit" class="ml-2 px-4 py-2 bg-blue-500 text-white rounded">Enviar</button>
+<!-- Chat container -->
+<div id="mensagens" class="flex flex-col gap-2 overflow-y-auto pt-20 px-4">
+  <!-- Aqui entram as mensagens -->
+</div>
+
+
+  <!-- Mensagens com espaçamento -->
+  <div id="mensagens" class="flex flex-col space-y-4"></div>
+
+    <!-- Input de mensagem -->
+    <form id="chat-form" class="mt-6 flex items-center gap-4">
+      <input id="message-input" type="text" placeholder="Escreve a tua mensagem..." class="flex-1 px-4 py-3 rounded-xl bg-white bg-opacity-90 text-black focus:outline-none focus:ring-2 focus:ring-blue-400" required />
+      <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-xl transition-all">
+        <img src="imagens/estrelaDeEnvio.png" alt="Enviar" class="w-6 h-6 hover:scale-110 transition-transform" />
+      </button>
     </form>
   </main>
 
-  <script src="Script.js"></script>
+  <script src="Index.js"></script>
 </body>
 </html>

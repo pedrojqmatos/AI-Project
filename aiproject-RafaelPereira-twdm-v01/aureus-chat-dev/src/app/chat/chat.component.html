@@ -1,0 +1,49 @@
+<main class="flex-1 px-8 flex flex-col h-screen relative bg-darkbg text-white">
+
+  <!-- Botão de perfil -->
+  <button (click)="toggleMenu()">
+    <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor"
+         class="size-10 absolute right-3 top-3">
+      <path fill-rule="evenodd" d="M18.685 19.097A9.723 9.723 0 0 0 21.75 12c0-5.385-4.365-9.75-9.75-9.75S2.25 6.615 2.25 12a9.723 9.723 0 0 0 3.065 7.097A9.716 9.716 0 0 0 12 21.75a9.716 9.716 0 0 0 6.685-2.653Zm-12.54-1.285A7.486 7.486 0 0 1 12 15a7.486 7.486 0 0 1 5.855 2.812A8.224 8.224 0 0 1 12 20.25a8.224 8.224 0 0 1-5.855-2.438ZM15.75 9a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0Z" clip-rule="evenodd" />
+    </svg>
+  </button>
+
+  <!-- Menu dropdown -->
+  <div *ngIf="showMenu" class="absolute top-16 right-4 bg-lightbg text-white p-4 rounded-lg shadow-lg z-20">
+    <div class="mb-2"><strong>{{ username() }}</strong></div>
+    <button (click)="logout()" class="bg-red-500 hover:bg-red-600 px-3 py-1 rounded">Logout</button>
+  </div>
+
+  <!-- Container central -->
+  <div class="flex flex-col w-[60%] mx-auto flex-1 mt-14 overflow-hidden">
+
+    <!-- Mensagens -->
+    <div class="flex-1 h-[90%] max-w-[1600px] overflow-y-auto space-y-2 pr-1 scroll-hidden">
+      <div *ngFor="let msg of messages"
+           class="p-4 rounded-lg whitespace-pre-wrap w-fit max-w-full"
+           [ngClass]="[
+             msg.sender === 'user' ? 'bg-lightbg ml-auto text-right' : 'bg-darkbg-800 mr-auto text-left',
+             msg.animate ? 'reveal-text' : ''
+           ]">
+        {{ msg.text }}
+      </div>
+    </div>
+
+    <!-- Indicador de loading -->
+    <div *ngIf="isLoading" class="text-blue-400 my-2">Thinking...</div>
+
+    <!-- Input de mensagem -->
+    <div class="relative mt-2 w-full mb-6 ">
+      <input [(ngModel)]="userInput"
+             (keyup.enter)="sendPrompt()"
+             type="text"
+             placeholder="Pergunte algo..."
+             class="w-full p-4 pr-12 rounded-lg bg-lightbg text-white placeholder-gray-400 focus:outline-none" />
+      <button (click)="sendPrompt()"
+              class="absolute right-4 top-1/2 transform -translate-y-1/2 text-white">
+        Enviar
+      </button>
+    </div>
+
+  </div>
+</main>
