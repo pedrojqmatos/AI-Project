@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Criar Conta - NebulAI</title>
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="Styles.css" />
+
+  <!-- Firebase (v8) -->
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
+
+  <script src="CriarConta.js" defer></script>
+</head>
+<body class="flex items-center justify-center h-screen text-white bg-gray-900">
+
+  <div class="bg-white bg-opacity-10 backdrop-blur-lg p-10 rounded-2xl shadow-2xl w-[400px]">
+    <h1 class="text-3xl font-semibold mb-6 text-center">
+      Criar conta na <span class="text-cyan-400">NebulAI</span>
+    </h1>
+
+    <form id="registo-form" class="space-y-5">
+      <input type="email" id="email" placeholder="Email" required
+        class="w-full px-4 py-3 rounded-xl bg-gray-800 text-white focus:outline-none focus:ring-2 focus:ring-cyan-400" />
+      <input type="password" id="password" placeholder="Palavra-passe" required
+        class="w-full px-4 py-3 rounded-xl bg-gray-800 text-white focus:outline-none focus:ring-2 focus:ring-cyan-400" />
+
+      <button type="submit" id="registar"
+        class="w-full bg-cyan-500 hover:bg-cyan-600 transition-all py-3 rounded-xl font-semibold text-white">
+        Criar conta
+      </button>
+    </form>
+
+    <div class="mt-6 text-sm text-center text-gray-300">
+      Já tens conta? <a href="Login.html" class="text-cyan-400 hover:underline">Iniciar sessão</a>
+    </div>
+  </div>
+
+</body>
+</html>

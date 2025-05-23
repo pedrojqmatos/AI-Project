@@ -1,3 +1,4 @@
+
 // recuperar.js
 document.getElementById("recuperar-form").addEventListener("submit", function(e) {
     e.preventDefault();
