@@ -1,0 +1,40 @@
+/* Fonte usada no projeto */
+body {
+    font-family: 'Poppins', sans-serif;
+  }
+  
+  /* Fundo escuro com imagem da nebulosa */
+  body::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: url("imagens/nebula.png");
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    opacity: 0.65;
+    z-index: -1;
+  }
+  
+  /* Ecrãs como login e recuperar usam opacidade mais leve */
+  body.login::before {
+    opacity: 0.35;
+  }
+  
+  /* Estilo básico para os campos de input */
+  input {
+    background-color: #1f2937; /* bg-gray-800 */
+    color: white;
+    padding: 0.5rem;
+    border-radius: 0.5rem;
+    width: 100%;
+  }
+  
+  /* Suavizar transições nos botões */
+  button {
+    transition: all 0.3s ease;
+  }
+  

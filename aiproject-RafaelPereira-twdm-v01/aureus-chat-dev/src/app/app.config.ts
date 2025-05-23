@@ -1,11 +1,14 @@
-import { ApplicationConfig, importProvidersFrom } from '@angular/core';
+import { ApplicationConfig } from '@angular/core';
 import { provideRouter } from '@angular/router';
-import {provideFirebaseApp} from '@angular/fire/app'
-import { routes } from './app.routes';
 import { provideHttpClient } from '@angular/common/http';
-import { initializeApp } from 'firebase/app';
-import {getAuth, provideAuth} from '@angular/fire/auth'
 
+import { provideFirebaseApp } from '@angular/fire/app';
+import { initializeApp } from 'firebase/app';
+
+import { getAuth, provideAuth } from '@angular/fire/auth';
+import { getFirestore, provideFirestore } from '@angular/fire/firestore';
+
+import { routes } from './app.routes';
 
 const firebaseConfig = {
   apiKey: "AIzaSyCaroJ5prNxfnT7XQLOaMqNxVMiEc2qTXw",
@@ -17,13 +20,12 @@ const firebaseConfig = {
   measurementId: "G-VPG76FWGY1"
 };
 
-
-
 export const appConfig: ApplicationConfig = {
   providers: [
     provideRouter(routes),
     provideHttpClient(),
     provideFirebaseApp(() => initializeApp(firebaseConfig)),
-    provideAuth(() => getAuth())
+    provideAuth(() => getAuth()),
+    provideFirestore(() => getFirestore()) 
   ]
 };
