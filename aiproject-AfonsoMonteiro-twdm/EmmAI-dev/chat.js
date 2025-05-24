@@ -9,7 +9,8 @@ import {
   doc,
   getDocs,
   addDoc,
-  setDoc
+  setDoc,
+  deleteDoc
 } from "https://www.gstatic.com/firebasejs/9.1.3/firebase-firestore.js";
 
 // 🔥 Config Firebase
@@ -142,6 +143,14 @@ function setupChat(uid) {
   });
 
   clearChats.addEventListener('click', async () => {
+    const convRef = collection(db, 'users', uid, 'conversations');
+    const snapshot = await getDocs(convRef);
+
+    const deletePromises = snapshot.docs.map(docItem =>
+      deleteDoc(doc(db, 'users', uid, 'conversations', docItem.id))
+    );
+    await Promise.all(deletePromises);
+
     conversations = [];
     currentChatId = null;
     chatMessages.innerHTML = '';
@@ -173,5 +182,5 @@ function setupChat(uid) {
     }
   });
 
-  loadConversations(); // Carrega as conversas salvas
+  loadConversations();
 }

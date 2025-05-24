@@ -1,3 +1,4 @@
+
 // Toggle dropdown do perfil
 function toggleProfile() {
   const dropdown = document.getElementById("profileDropdown");
