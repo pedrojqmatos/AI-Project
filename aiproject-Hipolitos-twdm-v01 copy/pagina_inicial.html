@@ -10,45 +10,52 @@
   <div class="layout">
     <aside class="sidebar">
         <div class="logo">
-            <img src="imagens/icon QIA.png" alt="Logo QIA">
-            <span>QIA</span>
+          <img src="imagens/icon QIA.png" alt="Logo QIA">
+          <span>QIA</span>
         </div>
+
         <div class="search-bar">
             <span class="icon">🔍</span>
             <input type="text" placeholder="Search..." />
         </div>
-      <nav class="menu">
-        <a href="#">Guide & FAQ</a>
-        <a href="#">Apagar conversas</a>
-        <a href="#">Atualizar</a>
-        <a href="#">Notificações</a>
-        <a href="#">Definições</a>
-        <a href="#">Sair</a>
-      </nav>
-      <div class="profile">
-        <img src="https://via.placeholder.com/40" alt="Avatar" />
-        <div>
-          <p>João Hipolito</p>
-          <small>joaopedrohipolito@gmail.com</small>
+
+        <nav class="menu">
+            <a href="#">Guide & FAQ</a>
+            <a href="#">Apagar conversas</a>
+            <a href="#">Atualizar</a>
+            <a href="#">Notificações</a>
+            <a href="#">Definições</a>
+            <a href="#">Sair</a>
+        </nav>
+
+        <div class="profile">
+            <img src="https://via.placeholder.com/40" alt="Avatar" />
+            <div>
+                <p>João Hipolito</p>
+                <small>joaopedrohipolito@gmail.com</small>
+            </div>
+            <button class="pro">Atualizar para pro</button>
         </div>
-        <button class="pro">Atualizar para pro</button>
-      </div>
     </aside>
 
     <main class="content">
       <section class="chat-area">
         <footer class="chat-footer">
-          <button>Apagar última pergunta</button>
-          <button>Falar</button>
-          <input type="text" placeholder="Escreve o que desejas" />
+          <button class="delete-all">Apagar última pergunta</button>
+
+          <div class="input-send-wrapper">
+            <input type="text" placeholder="Escreve o que desejas" />
+            <button class="send-btn">
+              <img src="imagens/Frame (1).png" alt="Enviar" />
+            </button>
+          </div>
         </footer>
       </section>
 
       <section class="sidebar-chat">
         <button class="new-chat">+ Nova conversa</button>
         <h3>Listagem de chat</h3>
-        <div class="chat-list">
-        </div>
+        <div class="chat-list"></div>
         <button class="delete-all">Apagar tudo</button>
       </section>
     </main>

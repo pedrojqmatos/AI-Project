@@ -1,6 +1,5 @@
 // profile.js
 
-// Firebase config – certifica-te que storageBucket está correto
 const firebaseConfig = {
   apiKey: "AIzaSyAuRhmtdebLqLluIEX5kEqE5j_IGvNaWQY",
   authDomain: "emmai-4b26e.firebaseapp.com",
@@ -11,7 +10,6 @@ const firebaseConfig = {
   measurementId: "G-FF19TKF6QP"
 };
 
-// Initialize Firebase
 firebase.initializeApp(firebaseConfig);
 const storage = firebase.storage();
 const db = firebase.firestore();
@@ -51,7 +49,6 @@ function saveProfile() {
         },
         () => {
           uploadTask.snapshot.ref.getDownloadURL().then((downloadURL) => {
-            // Debug: mostra o downloadURL no console para confirmar que está correto
             console.log("Download URL:", downloadURL);
             db.collection("users")
               .doc(userId)

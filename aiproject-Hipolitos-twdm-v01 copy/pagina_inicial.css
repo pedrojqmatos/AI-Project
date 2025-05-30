@@ -25,18 +25,40 @@ body, html {
   padding: 20px;
 }
 
+/* LOGO COM TEXTO À ESQUERDA E IMAGEM À DIREITA, AMBOS CENTRALIZADOS VERTICALMENTE */
 .logo {
+  display: flex;
+  align-items: center;
+  justify-content: space-between; /* espaça texto e imagem */
   font-weight: bold;
   font-size: 1.2rem;
   color: #00cc99;
   margin-bottom: 20px;
+  width: 20%; /* ocupar toda largura do sidebar */
+  gap: 10px;
 }
 
-.search {
+.logo img {
+  width: 30px;
+  height: auto;
+  /* Removido order para manter padrão */
+}
+
+.search-bar {
+  display: flex;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.search-bar .icon {
+  margin-right: 8px;
+}
+
+.search-bar input {
+  flex: 1;
   padding: 8px;
   border-radius: 6px;
   border: none;
-  margin-bottom: 20px;
 }
 
 .menu a {
@@ -103,6 +125,7 @@ body, html {
   display: flex;
   gap: 10px;
   align-items: center;
+  flex-wrap: wrap;
 }
 
 .chat-footer input {
@@ -112,12 +135,14 @@ body, html {
   border: none;
 }
 
-.sidebar-chat {
-  width: 300px;
-  background: #2a2d3e;
-  padding: 20px;
-  display: flex;
-  flex-direction: column;
+/* Botões */
+.delete-all {
+  background: #b90000;
+  border: none;
+  color: white;
+  padding: 10px;
+  border-radius: 6px;
+  cursor: pointer;
 }
 
 .new-chat {
@@ -127,6 +152,43 @@ body, html {
   padding: 10px;
   margin-bottom: 20px;
   border-radius: 6px;
+}
+
+.send-btn {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+}
+
+.send-btn img {
+  width: 22px;
+  height: 22px;
+}
+
+.input-send-wrapper {
+  display: flex;
+  align-items: center;
+  flex: 1;
+  background: white;
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.input-send-wrapper input {
+  border: none;
+  padding: 10px;
+  flex: 1;
+  font-size: 1rem;
+  outline: none;
+}
+
+/* Sidebar Chat */
+.sidebar-chat {
+  width: 300px;
+  background: #2a2d3e;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
 }
 
 .chat-list {
@@ -148,16 +210,7 @@ body, html {
   color: #aaa;
 }
 
-.delete-all {
-  background: #b90000;
-  border: none;
-  color: white;
-  padding: 10px;
-  margin-top: auto;
-  border-radius: 6px;
-}
-
-/* Responsividade */
+/* Responsivo */
 @media (max-width: 1024px) {
   .layout {
     flex-direction: column;
