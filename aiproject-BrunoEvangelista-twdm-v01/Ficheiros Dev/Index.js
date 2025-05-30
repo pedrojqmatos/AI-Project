@@ -1,16 +1,51 @@
+// Configuração Firebase
+const firebaseConfig = {
+  apiKey: "AIzaSyBisWry9zJcHgIJqMRbHThgqbE96yey5VU",
+  authDomain: "nebulai-7aa4b.firebaseapp.com",
+  projectId: "nebulai-7aa4b",
+  storageBucket: "nebulai-7aa4b.firebasestorage.app",
+  messagingSenderId: "916864728578",
+  appId: "1:916864728578:web:36989f77b8be431442f11b",
+  measurementId: "G-THXE4Y0HGF"
+};
 
-// Toggle dropdown do perfil
-function toggleProfile() {
-  const dropdown = document.getElementById("profileDropdown");
-  dropdown.classList.toggle("hidden");
-}
+firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
 
-// Dados iniciais
-let conversas = JSON.parse(localStorage.getItem("conversas")) || [];
+let user = null;
+let conversas = [];
 let conversaAtiva = null;
 const conversationsEl = document.getElementById("conversations");
 
-// Atualiza barra lateral
+firebase.auth().onAuthStateChanged(async (u) => {
+  if (!u) {
+    window.location.href = "Login.html";
+    return;
+  }
+
+  user = u;
+  document.getElementById("user-email").textContent = user.email;
+
+  // Buscar imagem de perfil (ou usar default)
+  const perfilImg = document.getElementById("profile-image");
+  const doc = await db.collection("utilizadores").doc(user.uid).get();
+  const data = doc.exists ? doc.data() : {};
+  perfilImg.src = data.photoURL || "imagens/perfil-default.png";
+
+  await carregarConversasFirestore();
+  atualizarSidebar();
+  atualizarMensagemBoasVindas();
+});
+
+async function carregarConversasFirestore() {
+  const doc = await db.collection("conversas").doc(user.uid).get();
+  conversas = doc.exists ? doc.data().conversas || [] : [];
+}
+
+async function guardarConversasFirestore() {
+  await db.collection("conversas").doc(user.uid).set({ conversas });
+}
+
 function atualizarSidebar() {
   conversationsEl.innerHTML = "";
   conversas.forEach((c, i) => {
@@ -55,7 +90,7 @@ function atualizarSidebar() {
       const input = prompt("Novo nome:", c.nome);
       if (input?.trim()) {
         conversas[i].nome = input.trim();
-        localStorage.setItem("conversas", JSON.stringify(conversas));
+        guardarConversasFirestore();
         atualizarSidebar();
       }
     };
@@ -70,7 +105,7 @@ function atualizarSidebar() {
         } else if (conversaAtiva > i) {
           conversaAtiva--;
         }
-        localStorage.setItem("conversas", JSON.stringify(conversas));
+        guardarConversasFirestore();
         atualizarSidebar();
         atualizarMensagemBoasVindas();
       }
@@ -83,7 +118,7 @@ function atualizarSidebar() {
         mensagens: [...c.mensagens],
       };
       conversas.splice(i + 1, 0, copia);
-      localStorage.setItem("conversas", JSON.stringify(conversas));
+      guardarConversasFirestore();
       atualizarSidebar();
     };
 
@@ -94,7 +129,6 @@ function atualizarSidebar() {
   });
 }
 
-// Carrega conversa selecionada
 function carregarConversa(index) {
   conversaAtiva = index;
   const mensagensDiv = document.getElementById("mensagens");
@@ -104,14 +138,12 @@ function carregarConversa(index) {
   atualizarMensagemBoasVindas();
 }
 
-// Guarda conversa nova
 function guardarConversa(nome, mensagens = []) {
   conversas.push({ nome, mensagens });
-  localStorage.setItem("conversas", JSON.stringify(conversas));
+  guardarConversasFirestore();
   atualizarSidebar();
 }
 
-// Nova conversa manual
 document.getElementById("nova-conversa").addEventListener("click", () => {
   const nome = "Nova Conversa " + (conversas.length + 1);
   guardarConversa(nome, []);
@@ -119,7 +151,6 @@ document.getElementById("nova-conversa").addEventListener("click", () => {
   carregarConversa(conversaAtiva);
 });
 
-// Submeter mensagem
 document.getElementById("chat-form").addEventListener("submit", async function (e) {
   e.preventDefault();
   const input = document.getElementById("message-input");
@@ -137,15 +168,22 @@ document.getElementById("chat-form").addEventListener("submit", async function (
   addMessage(texto, "user");
   input.value = "";
 
-  setTimeout(() => {
-    const resposta = "Simulação de resposta da IA a: " + texto;
+  const placeholder = "A pensar...";
+  addMessage(placeholder, "bot");
+
+  try {
+    const resposta = await obterRespostaDoModelo(texto);
     conversas[conversaAtiva].mensagens.push({ texto: resposta, tipo: "bot" });
     addMessage(resposta, "bot");
-    localStorage.setItem("conversas", JSON.stringify(conversas));
-  }, 500);
+    guardarConversasFirestore();
+  } catch (err) {
+    console.error("Erro ao contactar o modelo:", err);
+    const erro = "Erro ao contactar o modelo. Tens o Ollama a correr?";
+    conversas[conversaAtiva].mensagens.push({ texto: erro, tipo: "bot" });
+    addMessage(erro, "bot");
+  }
 });
 
-// Adiciona mensagem visualmente
 function addMessage(texto, tipo) {
   const mensagensDiv = document.getElementById("mensagens");
   const div = document.createElement("div");
@@ -154,15 +192,42 @@ function addMessage(texto, tipo) {
     ? "bg-blue-500 self-end"
     : "bg-gray-700 self-start");
   mensagensDiv.appendChild(div);
-
-  // Scrolla para a nova mensagem suavemente
   div.scrollIntoView({ behavior: "smooth", block: "end" });
 
   atualizarMensagemBoasVindas();
 }
 
+// Integração com o Ollama
+async function obterRespostaDoModelo(prompt) {
+  const res = await fetch("http://localhost:11434/api/generate", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      model: "mistral", // ou outro modelo que instalaste
+      prompt: prompt,
+      stream: false
+    })
+  });
 
-// Controla visibilidade da mensagem de boas-vindas
+  const data = await res.json();
+  return data.response;
+}
+
+// Toggle dropdown do perfil
+function toggleProfile() {
+  const dropdown = document.getElementById("profileDropdown");
+  dropdown.classList.toggle("hidden");
+}
+
+// Fecha dropdown se clicares fora
+window.addEventListener("click", (e) => {
+  const dropdown = document.getElementById("profileDropdown");
+  const btn = document.getElementById("profile-btn");
+  if (dropdown && !dropdown.classList.contains("hidden") && !btn.contains(e.target)) {
+    dropdown.classList.add("hidden");
+  }
+});
+
 function atualizarMensagemBoasVindas() {
   const welcome = document.getElementById("boas-vindas");
   if (!welcome) return;
@@ -171,11 +236,8 @@ function atualizarMensagemBoasVindas() {
   welcome.style.display = mensagensDoUtilizador ? "none" : "block";
 }
 
-// Logout
 document.getElementById("logout-btn").addEventListener("click", () => {
-  window.location.href = "Login.html";
+  firebase.auth().signOut().then(() => {
+    window.location.href = "Login.html";
+  });
 });
-
-// Iniciar
-atualizarSidebar();
-atualizarMensagemBoasVindas();
