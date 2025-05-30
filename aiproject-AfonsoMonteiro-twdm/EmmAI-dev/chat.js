@@ -71,7 +71,6 @@ onAuthStateChanged(auth, async (user) => {
   setupChat(uid);
 });
 
-// Função principal do chat
 function setupChat(uid) {
   const userInput = document.getElementById('userInput');
   const sendBtn = document.getElementById('sendBtn');
