@@ -1,9 +1,10 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, effect } from '@angular/core';
 import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { ChatService } from '../services/chat.service';
 import { NgFor } from '@angular/common';
-import { Observable } from 'rxjs';
+import { AuthService } from '../auth.service';
+import { Observable, of, switchMap } from 'rxjs';
 
 @Component({
   selector: 'app-sidebar',
@@ -14,8 +15,11 @@ import { Observable } from 'rxjs';
 export class SidebarComponent {
   private chatService = inject(ChatService);
   private router = inject(Router);
+  private authService = inject(AuthService);
 
-  chats$: Observable<any[]> = this.chatService.getChats();
+  chats$: Observable<any[]> = this.authService.user$.pipe( // <- espera pelo login
+    switchMap(user => user ? this.chatService.getChats() : of([]))
+  );
 
   async createNewChat() {
     const title = `Chat - ${new Date().toLocaleString()}`;

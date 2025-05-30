@@ -18,16 +18,15 @@
   <div class="flex flex-col w-[60%] mx-auto flex-1 mt-14 overflow-hidden">
 
     <!-- Mensagens -->
-    <div class="flex-1 h-[90%] max-w-[1600px] overflow-y-auto space-y-2 pr-1 scroll-hidden">
+    <div #scrollContainer class="flex-1 h-[90%] max-w-[1600px] overflow-y-auto space-y-2 pr-1 scroll-hidden">
       <div *ngFor="let msg of messages; let i = index; trackBy: trackByIndex"
         class="p-4 rounded-lg whitespace-pre-wrap w-fit max-w-full"
         [ngClass]="[
           msg.sender === 'user' ? 'bg-lightbg ml-auto text-right' : 'bg-darkbg-800 mr-auto text-left',
-          msg.animate ? 'reveal-text' : ''
         ]">
-      {{ msg.text }}
+      {{ msg.sender === 'ai' ? cleanResponse(msg.text) : msg.text }}
     </div>
-    </div>
+  </div>
 
     <!-- Indicador de loading -->
     <div *ngIf="isLoading" class="text-blue-400 my-2">Thinking...</div>
