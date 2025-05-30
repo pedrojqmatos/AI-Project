@@ -35,9 +35,19 @@ async function consultarLMStudio(prompt) {
         "Content-Type": "application/json"
       },
       body: JSON.stringify({
-        messages: [{ role: "user", content: prompt }],
+        model: "qwen3-0.6b", // 🔁 Replace with the actual model name you're using in LM Studio
+        messages: [
+          {
+            role: "system",
+            content: "You are a helpful assistant. Only reply with the final answer. Do NOT include internal thoughts or tags like <|begin_thought|> or <|end_thought|>."
+          },
+          {
+            role: "user",
+            content: prompt
+          }
+        ],
         temperature: 0.7,
-        max_tokens: 100
+        max_tokens: 200
       })
     });
 
@@ -47,12 +57,19 @@ async function consultarLMStudio(prompt) {
       throw new Error("Resposta inesperada do LM Studio");
     }
 
-    return dados.choices[0].message.content.trim();
+    // ✅ Clean up unexpected tags
+    let content = dados.choices[0].message.content.trim();
+    content = content.replace(/<\|begin_thought\|>[\s\S]*?<\|end_thought\|>/gi, "");
+    content = content.replace(/<\|.*?\|>/g, "");
+
+    return content.trim();
   } catch (erro) {
     console.error("Erro ao consultar LM Studio:", erro);
     return "[Erro ao consultar o modelo]";
   }
 }
+
+
 
 onAuthStateChanged(auth, async (user) => {
   if (!user) {
