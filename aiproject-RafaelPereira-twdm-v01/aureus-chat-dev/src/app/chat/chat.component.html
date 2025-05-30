@@ -15,34 +15,50 @@
   </div>
 
   <!-- Container central -->
-  <div class="flex flex-col w-[60%] mx-auto flex-1 mt-14 overflow-hidden">
+  <div *ngIf="!isChatLoading" class="flex flex-col w-[60%] mx-auto flex-1 mt-14 overflow-hidden">
 
-    <!-- Mensagens -->
-    <div #scrollContainer class="flex-1 h-[90%] max-w-[1600px] overflow-y-auto space-y-2 pr-1 scroll-hidden">
-      <div *ngFor="let msg of messages; let i = index; trackBy: trackByIndex"
-        class="p-4 rounded-lg whitespace-pre-wrap w-fit max-w-full"
-        [ngClass]="[
-          msg.sender === 'user' ? 'bg-lightbg ml-auto text-right' : 'bg-darkbg-800 mr-auto text-left',
-        ]">
-      {{ msg.sender === 'ai' ? cleanResponse(msg.text) : msg.text }}
+  <!-- Logotipo ao centro se não há mensagens -->
+    <div *ngIf="messages.length === 0 && !inProgressAiText" class="flex-1 flex flex-col items-center justify-center text-center">
+      <img src="../assets/images/logo.svg" class="w-[25vh] mb-4" />
+      <h2 class="text-7xl font-normal">
+        <span class="text-white">Aureus </span>
+        <span class="text-blue-400">Chat</span>
+      </h2>
     </div>
-  </div>
+
+  <!-- Mensagens -->
+    <div *ngIf="messages.length > 0 || inProgressAiText"
+        #scrollContainer
+        class="flex-1 h-[90%] max-w-[1600px] overflow-y-auto space-y-2 pr-1 scroll-hidden">
+
+      <div *ngFor="let msg of messages; let i = index; trackBy: trackByIndex"
+          class="animate-fade-in p-4 rounded-lg whitespace-pre-wrap w-fit max-w-full"
+          [ngClass]="[
+              msg.sender === 'user' ? 'bg-lightbg ml-auto text-right' : 'bg-darkbg-800 mr-auto text-left'
+          ]">
+        {{ msg.sender === 'ai' ? cleanResponse(msg.text) : msg.text }}
+      </div>
+
+      <div *ngIf="inProgressAiText"
+          class="animate-fade-in p-4 rounded-lg bg-darkbg-800 whitespace-pre-wrap w-fit max-w-full mr-auto text-left">
+        {{ cleanResponse(inProgressAiText) }}
+      </div>
+    </div>
 
     <!-- Indicador de loading -->
     <div *ngIf="isLoading" class="text-blue-400 my-2">Thinking...</div>
 
     <!-- Input de mensagem -->
-    <div class="relative mt-2 w-full mb-6 ">
+    <div class="relative mt-2 w-full mb-6">
       <input [(ngModel)]="userInput"
-             (keyup.enter)="sendPrompt()"
-             type="text"
-             placeholder="Pergunte algo..."
-             class="w-full p-4 pr-12 rounded-lg bg-lightbg text-white placeholder-gray-400 focus:outline-none" />
+            (keyup.enter)="sendPrompt()"
+            type="text"
+            placeholder="Pergunte algo..."
+            class="w-full p-4 pr-12 rounded-lg bg-lightbg text-white placeholder-gray-400 focus:outline-none" />
       <button (click)="sendPrompt()"
               class="absolute right-4 top-1/2 transform -translate-y-1/2 text-white">
         Enviar
       </button>
     </div>
-
   </div>
 </main>
