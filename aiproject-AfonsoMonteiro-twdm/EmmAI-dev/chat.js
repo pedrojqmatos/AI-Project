@@ -13,7 +13,6 @@ import {
   deleteDoc
 } from "https://www.gstatic.com/firebasejs/9.1.3/firebase-firestore.js";
 
-// 🔥 Config Firebase
 const firebaseConfig = {
   apiKey: "AIzaSyAuRhmtdebLqLluIEX5kEqE5j_IGvNaWQY",
   authDomain: "emmai-4b26e.firebaseapp.com",
@@ -28,7 +27,33 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
 
-// 👤 Espera usuário logar
+async function consultarLMStudio(prompt) {
+  try {
+    const resposta = await fetch("http://127.0.0.1:1234/v1/chat/completions", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        messages: [{ role: "user", content: prompt }],
+        temperature: 0.7,
+        max_tokens: 100
+      })
+    });
+
+    const dados = await resposta.json();
+
+    if (!dados.choices || !dados.choices[0]) {
+      throw new Error("Resposta inesperada do LM Studio");
+    }
+
+    return dados.choices[0].message.content.trim();
+  } catch (erro) {
+    console.error("Erro ao consultar LM Studio:", erro);
+    return "[Erro ao consultar o modelo]";
+  }
+}
+
 onAuthStateChanged(auth, async (user) => {
   if (!user) {
     window.location.href = '/login.html';
@@ -46,7 +71,7 @@ onAuthStateChanged(auth, async (user) => {
   setupChat(uid);
 });
 
-// 🚀 Função principal do chat
+// Função principal do chat
 function setupChat(uid) {
   const userInput = document.getElementById('userInput');
   const sendBtn = document.getElementById('sendBtn');
@@ -161,6 +186,7 @@ function setupChat(uid) {
   sendBtn.addEventListener('click', async () => {
     const text = userInput.value.trim();
     if (!text) return;
+
     const chat = conversations.find(c => c.id === currentChatId);
     if (!chat) return;
 
@@ -168,11 +194,16 @@ function setupChat(uid) {
     renderConversation(chat);
     userInput.value = '';
 
-    setTimeout(async () => {
-      chat.messages.push({ role: 'assistant', content: `You said: ${text}` });
-      renderConversation(chat);
-      await updateConversation(chat);
-    }, 500);
+    try {
+      const resposta = await consultarLMStudio(text);
+      chat.messages.push({ role: 'assistant', content: resposta });
+    } catch (err) {
+      chat.messages.push({ role: 'assistant', content: '[Erro ao consultar o modelo]' });
+      console.error(err);
+    }
+
+    renderConversation(chat);
+    await updateConversation(chat);
   });
 
   userInput.addEventListener('keydown', (e) => {
