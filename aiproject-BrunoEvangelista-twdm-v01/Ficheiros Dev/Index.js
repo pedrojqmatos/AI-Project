@@ -168,12 +168,20 @@ document.getElementById("chat-form").addEventListener("submit", async function (
   addMessage(texto, "user");
   input.value = "";
 
-  setTimeout(() => {
-    const resposta = "Simulação de resposta da IA a: " + texto;
+  const placeholder = "A pensar...";
+  addMessage(placeholder, "bot");
+
+  try {
+    const resposta = await obterRespostaDoModelo(texto);
     conversas[conversaAtiva].mensagens.push({ texto: resposta, tipo: "bot" });
     addMessage(resposta, "bot");
     guardarConversasFirestore();
-  }, 500);
+  } catch (err) {
+    console.error("Erro ao contactar o modelo:", err);
+    const erro = "Erro ao contactar o modelo. Tens o Ollama a correr?";
+    conversas[conversaAtiva].mensagens.push({ texto: erro, tipo: "bot" });
+    addMessage(erro, "bot");
+  }
 });
 
 function addMessage(texto, tipo) {
@@ -187,6 +195,22 @@ function addMessage(texto, tipo) {
   div.scrollIntoView({ behavior: "smooth", block: "end" });
 
   atualizarMensagemBoasVindas();
+}
+
+// Integração com o Ollama
+async function obterRespostaDoModelo(prompt) {
+  const res = await fetch("http://localhost:11434/api/generate", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      model: "mistral", // ou outro modelo que instalaste
+      prompt: prompt,
+      stream: false
+    })
+  });
+
+  const data = await res.json();
+  return data.response;
 }
 
 // Toggle dropdown do perfil
@@ -203,7 +227,6 @@ window.addEventListener("click", (e) => {
     dropdown.classList.add("hidden");
   }
 });
-
 
 function atualizarMensagemBoasVindas() {
   const welcome = document.getElementById("boas-vindas");
