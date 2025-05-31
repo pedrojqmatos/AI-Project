@@ -1,32 +1,38 @@
-import { Component, inject, computed, AfterViewInit, OnInit } from '@angular/core';
+import {
+  Component,
+  inject,
+  computed,
+  OnInit,
+  OnDestroy,
+  ViewChild,
+  ElementRef,
+  ChangeDetectorRef,
+  NgZone
+} from '@angular/core';
+
 import { Router } from '@angular/router';
-import { AuthService } from '../auth.service';
 import { ActivatedRoute } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+
+import { Subscription } from 'rxjs';
+
+import { AuthService } from '../auth.service';
 import { ChatService } from '../services/chat.service';
 import { AiService } from '../services/lmstudio.service';
-import { ChangeDetectorRef } from '@angular/core';
-import { NgZone } from '@angular/core';
-
-
 
 @Component({
   selector: 'app-chat',
   standalone: true,
   imports: [CommonModule, FormsModule],
   templateUrl: './chat.component.html',
-  styleUrl: './chat.component.css'
-
-  
+  styleUrls: ['./chat.component.css']
 })
-
-
-export class ChatComponent implements OnInit {
+export class ChatComponent implements OnInit, OnDestroy {
 
   private cdr = inject(ChangeDetectorRef);
   private zone = inject(NgZone);
-
+  @ViewChild('scrollContainer') scrollContainer!: ElementRef<HTMLDivElement>;
 
   private route = inject(ActivatedRoute);
   router = inject(Router);
@@ -36,14 +42,28 @@ export class ChatComponent implements OnInit {
 
   showMenu = false;
   userInput = '';
-  isChatActive = false;
   isLoading = false;
+  isChatLoading = true; // <-- novo
   chatId: string = '';
   messages: any[] = [];
 
-  
+  inProgressAiText = '';
 
   username = computed(() => this.authService.currentUserSig()?.username ?? null);
+
+
+  
+
+  private messagesSub: Subscription | undefined;
+
+  scrollToBottom() {
+    setTimeout(() => {
+      this.scrollContainer?.nativeElement.scrollTo({
+        top: this.scrollContainer.nativeElement.scrollHeight,
+        behavior: 'smooth'
+      });
+    }, 100);
+  }
 
   toggleMenu() {
     this.showMenu = !this.showMenu;
@@ -56,70 +76,99 @@ export class ChatComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.route.paramMap.subscribe(params => {
-      this.chatId = params.get('id') ?? '';
-      if (this.chatId) {
-        this.chatService.getMessages(this.chatId).subscribe(msgs => {
-          this.messages = msgs;
-        });
+    this.authService.user$.subscribe(user => {
+      if (!user) {
+        this.messages = [];
+        this.chatId = '';
+        this.isChatLoading = false;
+        this.messagesSub?.unsubscribe();
+        return;
       }
+      console.log(this.username)
+      this.route.paramMap.subscribe(params => {
+        const newChatId = params.get('id') ?? '';
+        if (newChatId !== this.chatId) {
+          this.chatId = newChatId;
+          this.messages = [];
+          this.isChatLoading = true;
+          this.messagesSub?.unsubscribe();
+
+           this.messagesSub = this.chatService.getMessages(this.chatId).subscribe(msgs => {
+            this.messages = msgs;
+            this.isChatLoading = false;
+            this.cdr.detectChanges();
+            this.scrollToBottom();
+          });
+        }
+      });
     });
   }
+
+  ngOnDestroy() {
+    this.messagesSub?.unsubscribe();
+  }
+
   trackByIndex(index: number, item: any) {
     return index;
   }
+
   cleanResponse(text: string): string {
     return text.replace(/<think>[\s\S]*?<\/think>/gi, '').trim();
   }
+
   async sendPrompt() {
-  if (!this.userInput.trim()) return;
+    if (!this.userInput.trim()) return;
 
-  const prompt = this.userInput.trim();
+    const prompt = this.userInput.trim();
 
-  // 1. Mostra logo a mensagem do utilizador na UI e guarda no Firestore
-  this.messages.push({ sender: 'user', text: prompt });
-  this.userInput = '';
-  this.isLoading = true;
-  await this.chatService.addMessage(this.chatId, 'user', prompt);
+    this.messages.push({ sender: 'user', text: prompt });
+    this.userInput = '';
+    this.isLoading = true;
+    this.inProgressAiText = '';
+    await this.chatService.addMessage(this.chatId, 'user', prompt);
 
-  // 2. Prepara o histórico para enviar no prompt à API
-  // (aqui podes montar o histórico como quiseres, ou só enviar o prompt, dependendo do que a API suporta)
-  const history = this.messages
-    .filter(m => m.sender === 'user' || m.sender === 'ai')
-    .map(m => `${m.sender === 'user' ? 'User' : 'AI'}: ${m.text}`)
-    .join('\n');
-  const fullPrompt = `${history}\nUser: ${prompt}\nAI:`;
+    const history = this.messages
+      .filter(m => m.sender === 'user' || m.sender === 'ai')
+      .map(m => `${m.sender === 'user' ? 'User' : 'AI'}: ${m.text}`)
+      .join('\n');
 
-  // 3. Adiciona uma mensagem vazia da AI para ir atualizando aos poucos
-  const aiMessage = { sender: 'ai', text: '', animate: true };
-  this.messages.push(aiMessage);
+    const fullPrompt = `${history}\nUser: ${prompt}\nAI:`;
 
-  try {
-      // 4. Chama o método de streaming e vai atualizando o texto da resposta da AI
-      await this.aiService.askStreaming(fullPrompt, (chunk) => {
-        console.log('Chunk recebido:', chunk, new Date().toISOString());
+    let fullText = '';
+    let insideThink = false;
+
+    try {
+      await this.aiService.askStreaming(fullPrompt, (chunk: string) => {
         this.zone.run(() => {
-          aiMessage.text += chunk;
-          
+          fullText += chunk;
+
+          if (/<think>/.test(fullText)) insideThink = true;
+          if (/<\/think>/.test(fullText)) {
+            insideThink = false;
+            fullText = fullText.replace(/<think>[\s\S]*?<\/think>/gi, '');
+          }
+
+          if (!insideThink) {
+            this.inProgressAiText = fullText.replace(/<think>[\s\S]*?<\/think>/gi, '');
+          }
+
           this.cdr.detectChanges();
-          console.log('Chunk aplicado na UI');
+          this.scrollToBottom();
         });
       });
 
+      const cleanFinal = this.cleanResponse(fullText);
+      this.messages.push({ sender: 'ai', text: cleanFinal });
+      await this.chatService.addMessage(this.chatId, 'ai', cleanFinal);
+      this.inProgressAiText = '';
 
-    // 5. Quando o streaming terminar, limpa o texto (exemplo)
-    aiMessage.text = this.cleanResponse(aiMessage.text);
-
-    // 6. Salva no Firestore a mensagem completa da AI
-    await this.chatService.addMessage(this.chatId, 'ai', aiMessage.text);
-
-  } catch (e) {
-    const errorMsg = '[Erro ao obter resposta da IA]';
-    aiMessage.text = errorMsg;
-    await this.chatService.addMessage(this.chatId, 'ai', errorMsg);
-  } finally {
-    this.isLoading = false;
+    } catch (e) {
+      const errorMsg = '[Erro ao obter resposta da IA]';
+      this.messages.push({ sender: 'ai', text: errorMsg });
+      await this.chatService.addMessage(this.chatId, 'ai', errorMsg);
+      this.inProgressAiText = '';
+    } finally {
+      this.isLoading = false;
+    }
   }
-}
-
 }
