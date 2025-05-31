@@ -5,7 +5,7 @@ const firebaseConfig = {
   apiKey: "AIzaSyAuRhmtdebLqLluIEX5kEqE5j_IGvNaWQY",
   authDomain: "emmai-4b26e.firebaseapp.com",
   projectId: "emmai-4b26e",
-  storageBucket: "emmai-4b26e.firebasestorage.app",
+  storageBucket: "emmai-4b26e.appspot.com",
   messagingSenderId: "1020422953738",
   appId: "1:1020422953738:web:ed10e3868d3b64af7538f3",
   measurementId: "G-FF19TKF6QP"
