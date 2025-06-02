@@ -26,7 +26,6 @@ firebase.auth().onAuthStateChanged(async (u) => {
   user = u;
   document.getElementById("user-email").textContent = user.email;
 
-  // Buscar imagem de perfil (ou usar default)
   const perfilImg = document.getElementById("profile-image");
   const doc = await db.collection("utilizadores").doc(user.uid).get();
   const data = doc.exists ? doc.data() : {};
@@ -168,13 +167,39 @@ document.getElementById("chat-form").addEventListener("submit", async function (
   addMessage(texto, "user");
   input.value = "";
 
-  setTimeout(() => {
-    const resposta = "Simulação de resposta da IA a: " + texto;
+  const mensagensDiv = document.getElementById("mensagens");
+  const loadingDiv = document.createElement("div");
+  loadingDiv.textContent = "A pensar...";
+  loadingDiv.className = "mb-2 p-2 rounded max-w-[75%] bg-gray-700 self-start";
+  mensagensDiv.appendChild(loadingDiv);
+  loadingDiv.scrollIntoView({ behavior: "smooth", block: "end" });
+
+  try {
+    const contexto = construirPromptComContexto(texto);
+    const resposta = await obterRespostaDoModelo(contexto);
     conversas[conversaAtiva].mensagens.push({ texto: resposta, tipo: "bot" });
-    addMessage(resposta, "bot");
+    loadingDiv.textContent = resposta;
     guardarConversasFirestore();
-  }, 500);
+  } catch (err) {
+    console.error("Erro ao contactar o modelo:", err);
+    const erro = "Erro ao contactar o modelo. Tens o Ollama a correr?";
+    conversas[conversaAtiva].mensagens.push({ texto: erro, tipo: "bot" });
+    loadingDiv.textContent = erro;
+  }
 });
+
+function construirPromptComContexto(novaMensagem) {
+  const mensagens = conversaAtiva !== null ? conversas[conversaAtiva].mensagens : [];
+  const ultimas = mensagens.slice(-5);
+
+  const contexto = ultimas.map(msg => {
+    return (msg.tipo === "user" ? "Utilizador: " : "Assistente: ") + msg.texto;
+  });
+
+  contexto.push("Utilizador: " + novaMensagem);
+
+  return contexto.join("\n");
+}
 
 function addMessage(texto, tipo) {
   const mensagensDiv = document.getElementById("mensagens");
@@ -189,13 +214,36 @@ function addMessage(texto, tipo) {
   atualizarMensagemBoasVindas();
 }
 
-// Toggle dropdown do perfil
+async function obterRespostaDoModelo(prompt) {
+  try {
+    const res = await fetch("http://localhost:11434/api/generate", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        model: "mistral",
+        prompt: prompt,
+        stream: false
+      })
+    });
+
+    if (!res.ok) {
+      console.error("Erro HTTP:", res.status);
+      throw new Error("Erro na resposta do modelo.");
+    }
+
+    const data = await res.json();
+    return data.response;
+  } catch (err) {
+    console.error("Erro ao contactar o modelo:", err);
+    throw err;
+  }
+}
+
 function toggleProfile() {
   const dropdown = document.getElementById("profileDropdown");
   dropdown.classList.toggle("hidden");
 }
 
-// Fecha dropdown se clicares fora
 window.addEventListener("click", (e) => {
   const dropdown = document.getElementById("profileDropdown");
   const btn = document.getElementById("profile-btn");
@@ -203,7 +251,6 @@ window.addEventListener("click", (e) => {
     dropdown.classList.add("hidden");
   }
 });
-
 
 function atualizarMensagemBoasVindas() {
   const welcome = document.getElementById("boas-vindas");

@@ -1,4 +1,3 @@
-// Firebase config
 const firebaseConfig = {
   apiKey: "AIzaSyAuRhmtdebLqLluIEX5kEqE5j_IGvNaWQY",
   authDomain: "emmai-4b26e.firebaseapp.com",
@@ -9,12 +8,10 @@ const firebaseConfig = {
   measurementId: "G-FF19TKF6QP"
 };
 
-// Inicializar Firebase
 firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
 const db = firebase.firestore();
 
-// Formulário de login
 document.getElementById('login-form').addEventListener('submit', async (e) => {
   e.preventDefault();
 
@@ -26,7 +23,6 @@ document.getElementById('login-form').addEventListener('submit', async (e) => {
     const user = userCredential.user;
     console.log('Login bem-sucedido:', user);
 
-    // Verifica se o perfil já existe no Firestore
     const userDocRef = db.collection('users').doc(user.uid);
     const userDoc = await userDocRef.get();
 
@@ -38,7 +34,6 @@ document.getElementById('login-form').addEventListener('submit', async (e) => {
       });
     }
 
-    // Redirecionar após login
     window.location.href = "/chat.html";
 
   } catch (error) {

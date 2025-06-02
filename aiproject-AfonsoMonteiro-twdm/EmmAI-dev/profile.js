@@ -1,6 +1,5 @@
 // profile.js
 
-// Firebase config – certifica-te que storageBucket está correto
 const firebaseConfig = {
   apiKey: "AIzaSyAuRhmtdebLqLluIEX5kEqE5j_IGvNaWQY",
   authDomain: "emmai-4b26e.firebaseapp.com",
@@ -11,13 +10,12 @@ const firebaseConfig = {
   measurementId: "G-FF19TKF6QP"
 };
 
-// Initialize Firebase
 firebase.initializeApp(firebaseConfig);
-const storage = firebase.storage();
 const db = firebase.firestore();
 const auth = firebase.auth();
 
 function updateProfilePicture() {
+  // Esta função é chamada pelo onchange do <input id="profilePicture"> no HTML
   const file = document.getElementById("profilePicture").files[0];
   const reader = new FileReader();
   reader.onloadend = () => {
@@ -28,7 +26,7 @@ function updateProfilePicture() {
   }
 }
 
-function saveProfile() {
+async function saveProfile() {
   const username = document.getElementById("username").value.trim();
   const file = document.getElementById("profilePicture").files[0];
 
@@ -37,46 +35,51 @@ function saveProfile() {
     return;
   }
 
-  auth.onAuthStateChanged((user) => {
-    if (user) {
-      const userId = user.uid;
-      const storageRef = storage.ref(`profile_pictures/${userId}/${file.name}`);
-      const uploadTask = storageRef.put(file);
+  // Lê a imagem como Base64 DataURL
+  const reader = new FileReader();
+  reader.onloadend = async () => {
+    const dataUrl = reader.result;
+    // dataUrl será algo como "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAA..."
 
-      uploadTask.on(
-        "state_changed",
-        null,
-        (error) => {
-          console.error("Upload failed:", error);
-        },
-        () => {
-          uploadTask.snapshot.ref.getDownloadURL().then((downloadURL) => {
-            // Debug: mostra o downloadURL no console para confirmar que está correto
-            console.log("Download URL:", downloadURL);
-            db.collection("users")
-              .doc(userId)
-              .set({
-                username: username,
-                profilePicture: downloadURL,
-              })
-              .then(() => {
-                const userProfile = {
-                  name: username,
-                  photo: downloadURL,
-                };
-                localStorage.setItem("userProfile", JSON.stringify(userProfile));
-                alert("Profile saved successfully.");
-              })
-              .catch((error) => {
-                console.error("Error saving profile:", error);
-              });
-          });
-        }
-      );
-    } else {
+    const user = auth.currentUser;
+    if (!user) {
       alert("You need to be logged in to save your profile.");
+      return;
     }
-  });
+
+    const userId = user.uid;
+    try {
+      // 1) Atualiza apenas o displayName no Firebase Auth
+      await user.updateProfile({
+        displayName: username
+        // Não definimos photoURL aqui (evita erro "Photo URL too long")
+      });
+
+      // 2) Grava no Firestore o Base64 da imagem e o username
+      await db.collection("users").doc(userId).set(
+        {
+          username: username,
+          profilePictureBase64: dataUrl
+        },
+        { merge: true }
+      );
+
+      // 3) Atualiza localStorage para uso imediato no chat
+      const userProfile = {
+        name: username,
+        photo: dataUrl  // Guardamos o Base64 no localStorage
+      };
+      localStorage.setItem("userProfile", JSON.stringify(userProfile));
+
+      alert("Profile saved successfully.");
+      window.location.href = "/chat.html"; // Redireciona para o chat
+    } catch (err) {
+      console.error("Error saving profile:", err);
+      alert("Error saving profile. Check console for details.");
+    }
+  };
+
+  reader.readAsDataURL(file);
 }
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -86,11 +89,11 @@ document.addEventListener("DOMContentLoaded", () => {
       db.collection("users")
         .doc(userId)
         .get()
-        .then((doc) => {
-          if (doc.exists) {
-            const data = doc.data();
-            if (data.profilePicture) {
-              document.getElementById("profileImage").src = data.profilePicture;
+        .then((docSnap) => {
+          if (docSnap.exists) {
+            const data = docSnap.data();
+            if (data.profilePictureBase64) {
+              document.getElementById("profileImage").src = data.profilePictureBase64;
             }
             if (data.username) {
               document.getElementById("username").value = data.username;
@@ -102,4 +105,9 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
   });
+
+  // Preview ao selecionar arquivo
+  document
+    .getElementById("profilePicture")
+    .addEventListener("change", updateProfilePicture);
 });

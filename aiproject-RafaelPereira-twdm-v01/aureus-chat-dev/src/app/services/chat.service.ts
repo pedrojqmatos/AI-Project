@@ -3,6 +3,8 @@ import { collection, addDoc, doc, setDoc, query, orderBy } from 'firebase/firest
 import { AuthService } from '../auth.service';
 import { Firestore, collectionData } from '@angular/fire/firestore';
 import { v4 as uuidv4 } from 'uuid';
+import { getDocs } from 'firebase/firestore';
+
 
 @Injectable({ providedIn: 'root' })
 export class ChatService {
@@ -24,10 +26,11 @@ export class ChatService {
     return id;
   }
 
-  getChats() {
-    const chatCollection = collection(this.firestore, `users/${this.userId}/chats`);
-    return collectionData(chatCollection, { idField: 'id' });
-  }
+ getChats() {
+  const chatCollection = collection(this.firestore, `users/${this.userId}/chats`);
+  const chatsQuery = query(chatCollection, orderBy('createdAt', 'desc'));
+  return collectionData(chatsQuery, { idField: 'id' });
+}
 
   getMessages(chatId: string) {
     const messagesCollection = collection(this.firestore, `users/${this.userId}/chats/${chatId}/messages`);
@@ -35,14 +38,26 @@ export class ChatService {
     return collectionData(messagesQuery, { idField: 'id' });
   }
 
-  async addMessage(chatId: string, sender: 'user' | 'ai', text: string) {
-    const messagesCollection = collection(this.firestore, `users/${this.userId}/chats/${chatId}/messages`);
-    await addDoc(messagesCollection, {
-      sender,
-      text,
-      timestamp: Date.now(),
-    });
+ async addMessage(chatId: string, sender: 'user' | 'ai', text: string) {
+  const userId = this.userId;
+  const messagesCollection = collection(this.firestore, `users/${userId}/chats/${chatId}/messages`);
+  await addDoc(messagesCollection, {
+    sender,
+    text,
+    timestamp: Date.now(),
+  });
+
+  if (sender === 'user') {
+    const snapshot = await getDocs(messagesCollection);
+    if (snapshot.size === 1) {
+      const chatDocRef = doc(this.firestore, `users/${userId}/chats/${chatId}`);
+      const MAX_TITLE_LENGTH = 25;
+      const truncatedTitle = text.length > MAX_TITLE_LENGTH ? text.slice(0, MAX_TITLE_LENGTH) + '…' : text;
+
+      await setDoc(chatDocRef, { title: truncatedTitle }, { merge: true });
+    }
   }
+}
 
   
 }
