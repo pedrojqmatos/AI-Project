@@ -42,5 +42,5 @@ testem.log
 Thumbs.db
 
 # Ignorar ficheiro com token Hugging Face
-src/app/environment.ts
+src\app\app.config.ts
 

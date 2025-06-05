@@ -6,6 +6,8 @@
     <input
       type="text"
       placeholder="Search Chats"
+      [(ngModel)]="searchTerm"
+      (input)="onSearchChange()"
       class="w-full pl-4 rounded-lg bg-darkerbg text-white placeholder-gray-400 border-2 border-lightbg focus:outline-none focus:ring-0"
     />
   </div>
@@ -29,5 +31,10 @@
         {{ chat.title }}
       </li>
     </ul>
+    
+    <!-- Mensagem quando não há resultados -->
+    <div *ngIf="(chats$ | async)?.length === 0 && searchTerm.trim()" class="text-gray-400 text-center mt-4">
+      Nenhum chat encontrado
+    </div>
   </div>
 </aside>
