@@ -175,30 +175,44 @@ document.getElementById("chat-form").addEventListener("submit", async function (
   loadingDiv.scrollIntoView({ behavior: "smooth", block: "end" });
 
   try {
-    const contexto = construirPromptComContexto(texto);
-    const resposta = await obterRespostaDoModelo(contexto);
+    const mensagens = construirMensagensParaModelo(texto);
+    const resposta = await obterRespostaDoModelo(mensagens);
     conversas[conversaAtiva].mensagens.push({ texto: resposta, tipo: "bot" });
     loadingDiv.textContent = resposta;
     guardarConversasFirestore();
   } catch (err) {
     console.error("Erro ao contactar o modelo:", err);
-    const erro = "Erro ao contactar o modelo. Tens o Ollama a correr?";
+    const erro = "Erro ao contactar o modelo. Verifica a ligação com o Together.ai.";
     conversas[conversaAtiva].mensagens.push({ texto: erro, tipo: "bot" });
     loadingDiv.textContent = erro;
   }
 });
 
-function construirPromptComContexto(novaMensagem) {
+function construirMensagensParaModelo(novaMensagem) {
   const mensagens = conversaAtiva !== null ? conversas[conversaAtiva].mensagens : [];
   const ultimas = mensagens.slice(-5);
 
-  const contexto = ultimas.map(msg => {
-    return (msg.tipo === "user" ? "Utilizador: " : "Assistente: ") + msg.texto;
+  const mensagensAPI = [
+    {
+      role: "system",
+      content: "Tu és a NebulAI, uma assistente virtual simpática e útil, que responde sempre em português europeu. O teu nome é fixo: NebulAI. Nunca uses emojis, nunca te chames Assistente, e responde sempre com clareza e profissionalismo."
+    }
+  ];
+
+  ultimas.forEach(m => {
+    mensagensAPI.push({
+      role: m.tipo === "user" ? "user" : "assistant",
+      content: m.texto
+    });
   });
 
-  contexto.push("Utilizador: " + novaMensagem);
+  const primeiraVez = ultimas.length === 0;
+  const userPrompt = primeiraVez
+    ? `Chama-te NebulAI. Nunca digas que te chamas Assistente. Agora responde: ${novaMensagem}`
+    : novaMensagem;
 
-  return contexto.join("\n");
+  mensagensAPI.push({ role: "user", content: userPrompt });
+  return mensagensAPI;
 }
 
 function addMessage(texto, tipo) {
@@ -214,27 +228,38 @@ function addMessage(texto, tipo) {
   atualizarMensagemBoasVindas();
 }
 
-async function obterRespostaDoModelo(prompt) {
+async function obterRespostaDoModelo(messages) {
+  // Usa exatamente o token que te deram (sem prefixo extra)
+  const TOGETHER_TOKEN = "37b9073cf4874823776d6d57ab6035a5036265492883cf006963756887d5daa3";
+
+  console.log("🔎 Enviando para o modelo:", JSON.stringify({
+    model: "mistralai/Mistral-7B-Instruct-v0.1",
+    messages: messages,
+    max_tokens: 300,
+    temperature: 0.7
+  }, null, 2));
+
   try {
-    const res = await fetch("http://localhost:11434/api/generate", {
+    const resposta = await fetch("https://api.together.ai/v1/chat/completions", {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: {
+        "Authorization": `Bearer ${TOGETHER_TOKEN}`,
+        "Content-Type": "application/json"
+      },
       body: JSON.stringify({
-        model: "mistral",
-        prompt: prompt,
-        stream: false
+        model: "mistralai/Mistral-7B-Instruct-v0.1",
+        messages,
+        max_tokens: 300,
+        temperature: 0.7
       })
     });
 
-    if (!res.ok) {
-      console.error("Erro HTTP:", res.status);
-      throw new Error("Erro na resposta do modelo.");
-    }
+    if (!resposta.ok) throw new Error("Erro HTTP: " + resposta.status);
 
-    const data = await res.json();
-    return data.response;
+    const data = await resposta.json();
+    return data.choices?.[0]?.message?.content || "❌ Erro: resposta vazia.";
   } catch (err) {
-    console.error("Erro ao contactar o modelo:", err);
+    console.error("Erro ao contactar Together:", err);
     throw err;
   }
 }
