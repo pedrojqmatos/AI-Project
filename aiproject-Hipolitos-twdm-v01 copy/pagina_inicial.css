@@ -194,6 +194,30 @@ body, html {
 .chat-list {
   flex: 1;
   margin-top: 10px;
+
+  display: flex;           /* novo: tornar flex container */
+  flex-direction: column;  /* empilha verticalmente */
+  gap: 8px;                /* espaçamento entre botões */
+}
+
+/* Exemplo de estilo para os botões da lista de chats */
+.chat-history-button, /* pode usar a classe que seu JS cria para os botões */
+.chat-list button {
+  display: block;
+  width: 100%;
+  text-align: left;
+  padding: 8px 12px;
+  background-color: #f0f0f0;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+  color: #333;
+}
+
+.chat-history-button:hover,
+.chat-list button:hover {
+  background-color: #ddd;
 }
 
 .chat-item {
