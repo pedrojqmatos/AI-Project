@@ -41,6 +41,4 @@ testem.log
 .DS_Store
 Thumbs.db
 
-# Ignorar ficheiro com token Hugging Face
-src/app/environment.ts
 

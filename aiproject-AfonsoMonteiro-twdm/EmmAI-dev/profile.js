@@ -1,4 +1,3 @@
-// profile.js
 
 const firebaseConfig = {
   apiKey: "AIzaSyAuRhmtdebLqLluIEX5kEqE5j_IGvNaWQY",
@@ -15,7 +14,6 @@ const db = firebase.firestore();
 const auth = firebase.auth();
 
 function updateProfilePicture() {
-  // Esta função é chamada pelo onchange do <input id="profilePicture"> no HTML
   const file = document.getElementById("profilePicture").files[0];
   const reader = new FileReader();
   reader.onloadend = () => {
@@ -35,11 +33,9 @@ async function saveProfile() {
     return;
   }
 
-  // Lê a imagem como Base64 DataURL
   const reader = new FileReader();
   reader.onloadend = async () => {
     const dataUrl = reader.result;
-    // dataUrl será algo como "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAA..."
 
     const user = auth.currentUser;
     if (!user) {
@@ -49,13 +45,10 @@ async function saveProfile() {
 
     const userId = user.uid;
     try {
-      // 1) Atualiza apenas o displayName no Firebase Auth
       await user.updateProfile({
         displayName: username
-        // Não definimos photoURL aqui (evita erro "Photo URL too long")
       });
 
-      // 2) Grava no Firestore o Base64 da imagem e o username
       await db.collection("users").doc(userId).set(
         {
           username: username,
@@ -64,15 +57,14 @@ async function saveProfile() {
         { merge: true }
       );
 
-      // 3) Atualiza localStorage para uso imediato no chat
       const userProfile = {
         name: username,
-        photo: dataUrl  // Guardamos o Base64 no localStorage
+        photo: dataUrl  
       };
       localStorage.setItem("userProfile", JSON.stringify(userProfile));
 
       alert("Profile saved successfully.");
-      window.location.href = "/chat.html"; // Redireciona para o chat
+      window.location.href = "/chat.html"; 
     } catch (err) {
       console.error("Error saving profile:", err);
       alert("Error saving profile. Check console for details.");
@@ -106,7 +98,6 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 
-  // Preview ao selecionar arquivo
   document
     .getElementById("profilePicture")
     .addEventListener("change", updateProfilePicture);

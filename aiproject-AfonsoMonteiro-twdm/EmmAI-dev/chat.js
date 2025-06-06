@@ -1,9 +1,9 @@
-// chat.js
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.1.3/firebase-app.js";
 import {
   getAuth,
-  onAuthStateChanged
+  onAuthStateChanged,
+  signOut
 } from "https://www.gstatic.com/firebasejs/9.1.3/firebase-auth.js";
 import {
   getFirestore,
@@ -42,7 +42,7 @@ async function consultarLMStudio(prompt) {
           {
             role: "system",
             content: [
-              "You are a helpful assistant.",
+              "You are a helpful assistant, you are EmmAI.",
               "Answer only with the final response—no internal thoughts or <think> tags."
             ].join(" ")
           },
@@ -61,13 +61,10 @@ async function consultarLMStudio(prompt) {
       throw new Error("Resposta inesperada do LM Studio");
     }
 
-    // Pega o texto bruto
     let content = dados.choices[0].message.content.trim();
 
-    // Remove qualquer bloco <think>…</think> no início
     content = content.replace(/^(?:<think>[\s\S]*?<\/think>\s*)/, "");
 
-    // Remove outros tokens internos, se existirem
     content = content.replace(/<\|begin_thought\|>[\s\S]*?<\|end_thought\|>/gi, "");
     content = content.replace(/<\|.*?\|>/g, "");
 
@@ -85,7 +82,6 @@ onAuthStateChanged(auth, async (user) => {
   }
 
   const uid = user.uid;
-  // Primeiro, tentamos ler do localStorage (onde pode haver Base64 salvo pelo profile.js)
   const stored = JSON.parse(localStorage.getItem("userProfile")) || {};
   const name = stored.name || user.displayName || "User";
   const photo = stored.photo || "https://via.placeholder.com/40";
@@ -95,7 +91,6 @@ onAuthStateChanged(auth, async (user) => {
     photo: photo,
     email: user.email
   };
-  // Note: gravamos novamente no localStorage para consolidar
   localStorage.setItem("userProfile", JSON.stringify(profile));
 
   setupChat(uid);
@@ -111,6 +106,7 @@ function setupChat(uid) {
   const clearChats = document.getElementById("clearChats");
   const userPhoto = document.getElementById("userPhoto");
   const userName = document.getElementById("userName");
+  const logoutBtn = document.getElementById("logoutBtn");
 
   const profile = JSON.parse(localStorage.getItem("userProfile")) || {};
   userName.textContent = profile.name;
@@ -216,6 +212,17 @@ function setupChat(uid) {
     await createNewConversation("Hi, how can I help you today?");
   });
 
+  logoutBtn.addEventListener("click", async () => {
+    try {
+      await signOut(auth);
+      localStorage.removeItem("userProfile");
+      window.location.href = "/login.html";
+    } catch (error) {
+      console.error("Erro ao fazer logout:", error);
+      alert("Erro ao fazer logout. Tente novamente.");
+    }
+  });
+
   sendBtn.addEventListener("click", async () => {
     const text = userInput.value.trim();
     if (!text) return;
@@ -246,6 +253,5 @@ function setupChat(uid) {
     }
   });
 
-  // carrega conversas existentes ao iniciar
   loadConversations();
 }
