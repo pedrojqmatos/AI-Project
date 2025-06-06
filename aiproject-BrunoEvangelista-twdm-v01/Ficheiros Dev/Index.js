@@ -182,7 +182,7 @@ document.getElementById("chat-form").addEventListener("submit", async function (
     guardarConversasFirestore();
   } catch (err) {
     console.error("Erro ao contactar o modelo:", err);
-    const erro = "Erro ao contactar o modelo. Tens o Ollama a correr?";
+    const erro = "Erro ao contactar o modelo. Verifica a ligação com o Together.ai.";
     conversas[conversaAtiva].mensagens.push({ texto: erro, tipo: "bot" });
     loadingDiv.textContent = erro;
   }
@@ -215,27 +215,33 @@ function addMessage(texto, tipo) {
 }
 
 async function obterRespostaDoModelo(prompt) {
+  const TOGETHER_TOKEN = "37b9073cf4874823776d6d57ab6035a5036265492883cf006963756887d5daa3";
+
   try {
-    const res = await fetch("http://localhost:11434/api/generate", {
+    const resposta = await fetch("https://api.together.ai/v1/chat/completions", {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: {
+        "Authorization": `Bearer ${TOGETHER_TOKEN}`,
+        "Content-Type": "application/json"
+      },
       body: JSON.stringify({
-        model: "mistral",
-        prompt: prompt,
-        stream: false
+        model: "mistralai/Mixtral-8x7B-Instruct-v0.1",
+        messages: [
+          { role: "system", content: "Responde como um assistente útil e simpático." },
+          { role: "user", content: prompt }
+        ],
+        max_tokens: 300,
+        temperature: 0.7
       })
     });
 
-    if (!res.ok) {
-      console.error("Erro HTTP:", res.status);
-      throw new Error("Erro na resposta do modelo.");
-    }
+    if (!resposta.ok) throw new Error("Erro HTTP: " + resposta.status);
 
-    const data = await res.json();
-    return data.response;
+    const data = await resposta.json();
+    return data.choices[0]?.message?.content || "❌ Erro: resposta vazia.";
   } catch (err) {
-    console.error("Erro ao contactar o modelo:", err);
-    throw err;
+    console.error("Erro ao contactar Together:", err);
+    return "❌ Erro ao contactar o modelo.";
   }
 }
 
